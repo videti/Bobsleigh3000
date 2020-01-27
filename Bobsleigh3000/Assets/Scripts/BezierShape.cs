@@ -94,10 +94,11 @@ public class BezierShape : MonoBehaviour
     }
 
     /**
-     * Get Arch Point from an Origin, oriented on Z axis
+     * Get Arch Point from an Origin, oriented on X axis
      * */
     public Vector3[] GetArchPoints(Vector3 origin, float radius = 1f, float startAngle = 0, float endAngle = 180f, int nbPoints = 5)
     {
+        origin = new Vector3(origin.z, origin.y, origin.x);
         startAngle = NormalizeDegAngle(startAngle);
         endAngle = NormalizeDegAngle(endAngle);
 
@@ -119,7 +120,7 @@ public class BezierShape : MonoBehaviour
         return points.ToArray();
     }
 
-    public Mesh GetPipeMeshFromBezier(float startAngle, float endAngle, int nbPoints)
+    public Mesh GetPipeMeshFromBezier()
     {
         Vector3[] previousArchPoints = new Vector3[0];
         Vector3[] archPoints;
@@ -157,7 +158,7 @@ public class BezierShape : MonoBehaviour
 
         MeshFilter mf = gameObject.AddComponent<MeshFilter>();
         MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-        mf.mesh = GetPipeMeshFromBezier(startAngle, endAngle, nbPoints);
+        mf.mesh = GetPipeMeshFromBezier();
         mr.material = _shapeMat;
     }
 
@@ -201,7 +202,6 @@ public class BezierShape : MonoBehaviour
             triangles.Add(s1);
             triangles.Add(s3);
         }
-        Debug.Log(vertices.Count());
     }
 
     float NormalizeDegAngle(float angle)
