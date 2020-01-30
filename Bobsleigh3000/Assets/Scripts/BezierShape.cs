@@ -96,27 +96,28 @@ public class BezierShape : MonoBehaviour
     /**
      * Get Arch Point from an Origin, oriented on X axis
      * */
-    public Vector3[] GetArchPoints(Vector3 origin, float radius = 1f, float startAngle = 0, float endAngle = 180f, int nbPoints = 5)
+    public Vector3[] GetArchPoints(Vector3 origin, float radius = 1f, float startAngle = 360f, float endAngle = 0, int nbPoints = 16)
     {
-        origin = new Vector3(origin.z, origin.y, origin.x);
         startAngle = NormalizeDegAngle(startAngle);
         endAngle = NormalizeDegAngle(endAngle);
 
-        if (endAngle <= startAngle)
+        if (endAngle < startAngle)
         {
-            Debug.LogError("Wrong parameters endAngle <= startAngle : Start angle " + startAngle + " - End Angle : " + endAngle);
-            return null; //wrong parameters
+            float tmp = startAngle;
+            startAngle = endAngle;
+            endAngle = tmp;
+        } else if (endAngle == startAngle)
+        {
+            endAngle += 360f;
         }
-
+        
         List<Vector3> points = new List<Vector3>();
-        float totalAngle = Mathf.Deg2Rad * (endAngle - startAngle);
-        float teta = Mathf.Deg2Rad * startAngle;
-        for (int i = 0; i < nbPoints; i++)
+        float totalAngle = (endAngle - startAngle);
+        for (int i = 0; i <= nbPoints; i++)
         {
-            points.Add(new Vector3(origin.x + radius * Mathf.Cos(teta), origin.y + radius * Mathf.Sin(teta), origin.z));
-            teta += totalAngle / nbPoints;
+            float teta = Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
+            points.Add(new Vector3(origin.x, origin.y + radius * Mathf.Sin(teta), origin.z + radius * Mathf.Cos(teta)));
         }
-
         return points.ToArray();
     }
 
@@ -166,41 +167,32 @@ public class BezierShape : MonoBehaviour
     {
         for (int i = 0; i < arch1.Length - 1; i++)
         {
-            int s0, s1;
-            if (i == 0)
-            {
-                vertices.Add(arch1[i]);
-                s0 = vertices.Count() - 1;
-                vertices.Add(arch1[i + 1]);
-                s1 = vertices.Count() - 1;
-            } else
-            {
-                s0 = vertices.Count() - 2;
-                s1 = vertices.Count() - 1;
-            }
-
+            vertices.Add(arch1[i]);
+            vertices.Add(arch1[i + 1]);
             vertices.Add(arch2[i]);
-            int s2 = vertices.Count() - 1;
             vertices.Add(arch2[i + 1]);
-            int s3 = vertices.Count() - 1;
+            int s0_0 = vertices.Count() - 4; //arch0_0
+            int s0_1 = vertices.Count() - 3; //arch0_1
+            int s1_0 = vertices.Count() - 2; //arch1_0
+            int s1_1 = vertices.Count() - 1; //arch1_1
 
 
             //two faced
-            triangles.Add(s0);
-            triangles.Add(s1);
-            triangles.Add(s2);
+            triangles.Add(s0_0);
+            triangles.Add(s0_1);
+            triangles.Add(s1_0);
 
-            triangles.Add(s3);
-            triangles.Add(s1);
-            triangles.Add(s2);
+            triangles.Add(s0_0);
+            triangles.Add(s1_0);
+            triangles.Add(s0_1);
 
-            triangles.Add(s2);
-            triangles.Add(s1);
-            triangles.Add(s0);
+            triangles.Add(s1_1);
+            triangles.Add(s1_0);
+            triangles.Add(s0_1);
 
-            triangles.Add(s2);
-            triangles.Add(s1);
-            triangles.Add(s3);
+            triangles.Add(s1_1);
+            triangles.Add(s0_1);
+            triangles.Add(s1_0);
         }
     }
 
