@@ -9760,11 +9760,12 @@ MonoBehaviour:
   - {x: 1.5, y: -1, z: 0}
   - {x: 2, y: 1, z: 0}
   nbPoints: 10
+  thickness: 0.05
   matName: opaqueWhite
-  startWidth: 0.2
-  endWidth: 0.2
+  startWidth: 0.1
+  endWidth: 0.1
   startAngle: 0
-  endAngle: 359
+  endAngle: 197
 --- !u!4 &1699592246
 Transform:
   m_ObjectHideFlags: 0

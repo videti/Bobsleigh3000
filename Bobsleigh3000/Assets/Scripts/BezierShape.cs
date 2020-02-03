@@ -10,6 +10,7 @@ public class BezierShape : MonoBehaviour
     public Vector3[] controlPoints;
     [Range(3,20)]
     public int nbPoints = 10;
+    public float thickness = 0.2f;
     public String matName = "opaqueWhite";
     [Range(0.1f, 2f)]
     public float startWidth = 1f, endWidth = 1f;
@@ -116,15 +117,15 @@ public class BezierShape : MonoBehaviour
         for (int i = 0; i <= nbPoints; i++)
         {
             float teta = Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
-            points.Add(new Vector3(origin.x, origin.y + radius * Mathf.Sin(teta), origin.z + radius * Mathf.Cos(teta)));
+            points.Add(new Vector3(origin.x, -1f * (origin.y + radius * Mathf.Sin(teta)), origin.z + radius * Mathf.Cos(teta)));
         }
         return points.ToArray();
     }
 
     public Mesh GetPipeMeshFromBezier()
     {
-        Vector3[] previousArchPoints = new Vector3[0];
-        Vector3[] archPoints;
+        Vector3[] previousArchPoints = new Vector3[0], previousArchBottomPoints = new Vector3[0];
+        Vector3[] archPoints, archBottomPoints;
         List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
 
         Mesh _mesh = new Mesh();
@@ -133,13 +134,20 @@ public class BezierShape : MonoBehaviour
 
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
-            archPoints = GetArchPoints(bezierPoints[archNum]); //todo : change with correct params
+            archPoints = GetArchPoints(bezierPoints[archNum], startWidth, startAngle, endAngle, nbPoints); //todo : change with correct params
+            archBottomPoints = GetArchPoints(bezierPoints[archNum], startWidth + thickness, startAngle, endAngle, nbPoints); //todo : change with correct params
             if (previousArchPoints.Length != 0)
             {
                 JointTwoArches(ref triangles, ref vertices, previousArchPoints, archPoints);
+                JointTwoArches(ref triangles, ref vertices, previousArchBottomPoints, archBottomPoints);
             }
             previousArchPoints = archPoints;
+            previousArchBottomPoints = archBottomPoints;
+
+
+            JointFrontAndBottomArches(ref triangles, ref vertices, archPoints, archBottomPoints);
         }
+        
         _mesh.vertices = vertices.ToArray();
         _mesh.triangles = triangles.ToArray();
         
@@ -176,7 +184,6 @@ public class BezierShape : MonoBehaviour
             int s1_0 = vertices.Count() - 2; //arch1_0
             int s1_1 = vertices.Count() - 1; //arch1_1
 
-
             //two faced
             triangles.Add(s0_0);
             triangles.Add(s0_1);
@@ -195,6 +202,67 @@ public class BezierShape : MonoBehaviour
             triangles.Add(s1_0);
         }
     }
+
+    void JointFrontAndBottomArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] archPoints, Vector3[] archBottomPoints)
+    {
+        for (int archPointNum = 0; archPointNum < archPoints.Count(); archPointNum++)
+        {
+            int firstP0 = 0, firstP1 = 0;
+            int s0_0, s0_1, s1_0, s1_1;
+            if (archPointNum != archPoints.Count() - 1)
+            {
+                vertices.Add(archPoints[archPointNum]);
+                vertices.Add(archPoints[archPointNum + 1]);
+                vertices.Add(archBottomPoints[archPointNum]);
+                vertices.Add(archBottomPoints[archPointNum + 1]);
+                s0_0 = vertices.Count() - 4; //arch0_0
+                s0_1 = vertices.Count() - 3; //arch0_1
+                s1_0 = vertices.Count() - 2; //arch1_0
+                s1_1 = vertices.Count() - 1; //arch1_1
+                //premiers points
+                if(archPointNum == 0)
+                {
+                    firstP0 = s0_0;
+                    firstP1 = s1_0;
+                }
+                //two faced
+                triangles.Add(s0_0);
+                triangles.Add(s0_1);
+                triangles.Add(s1_0);
+
+                triangles.Add(s0_0);
+                triangles.Add(s1_0);
+                triangles.Add(s0_1);
+
+                triangles.Add(s1_1);
+                triangles.Add(s1_0);
+                triangles.Add(s0_1);
+
+                triangles.Add(s1_1);
+                triangles.Add(s0_1);
+                triangles.Add(s1_0);
+            } else
+            //derniers points
+            {
+                s0_0 = vertices.Count() - 4; //arch0_0
+                s0_1 = firstP0; //arch0_1
+                s1_0 = vertices.Count() - 2; //arch1_0
+                s1_1 = firstP1; //arch1_1
+            }
+            
+        }
+    }
+
+    Vector3[] GetBottomArchPoints(Vector3[] arch, float thickness = 0.5f)
+    {
+        Vector3[] archBis = new Vector3[arch.Length];
+        for (int i = 0; i < arch.Length; i++)
+        {
+            archBis[i] = arch[i] + new Vector3(0, thickness, 0);
+        }
+        return archBis;
+    }
+
 
     float NormalizeDegAngle(float angle)
     {
