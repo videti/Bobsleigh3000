@@ -8,14 +8,14 @@ public class BezierShape : MonoBehaviour
 {
     //public params
     public Vector3[] controlPoints;
-    [Range(3,20)]
-    public int nbPoints = 10;
-    public float thickness = 0.2f;
+    [Range(3,30)]
+    public int nbPoints = 30;
+    public float thickness = 0.05f;
     public String matName = "opaqueWhite";
     [Range(0.1f, 2f)]
     public float startWidth = 1f, endWidth = 1f;
     [Range(0, 359f)]
-    public float startAngle = 0, endAngle = 359f;
+    public float startAngle = 0, endAngle = 180f;
 
     Material _shapeMat;
 
@@ -97,7 +97,7 @@ public class BezierShape : MonoBehaviour
     /**
      * Get Arch Point from an Origin, oriented on X axis
      * */
-    public Vector3[] GetArchPoints(Vector3 origin, float radius = 1f, float startAngle = 360f, float endAngle = 0, int nbPoints = 16)
+    public Vector3[] GetArchPoints(Vector3 origin, Vector3 dir, float radius = 1f, float startAngle = 360f, float endAngle = 0, int nbPoints = 16)
     {
         startAngle = NormalizeDegAngle(startAngle);
         endAngle = NormalizeDegAngle(endAngle);
@@ -107,17 +107,23 @@ public class BezierShape : MonoBehaviour
             float tmp = startAngle;
             startAngle = endAngle;
             endAngle = tmp;
-        } else if (endAngle == startAngle)
+        }
+        else
+        if (endAngle == startAngle)
         {
             endAngle += 360f;
         }
-        
+        dir = Vector3.Normalize(dir);
         List<Vector3> points = new List<Vector3>();
         float totalAngle = (endAngle - startAngle);
+        float sign = dir.x > 0 ? -1f : 1f;
         for (int i = 0; i <= nbPoints; i++)
         {
-            float teta = Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
-            points.Add(new Vector3(origin.x, -1f * (origin.y + radius * Mathf.Sin(teta)), origin.z + radius * Mathf.Cos(teta)));
+            float teta = sign * Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
+            Vector3 newPoint = new Vector3(origin.x, (origin.y + radius * Mathf.Sin(teta)), origin.z + radius * Mathf.Cos(teta));
+            Debug.Log(Mathf.Acos(dir.x) * Mathf.Rad2Deg);
+            newPoint = Quaternion.Euler(Mathf.Acos(dir.x) * Mathf.Rad2Deg, 0, 0) * newPoint;
+            points.Add(newPoint);
         }
         return points.ToArray();
     }
@@ -134,8 +140,17 @@ public class BezierShape : MonoBehaviour
 
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
-            archPoints = GetArchPoints(bezierPoints[archNum], startWidth, startAngle, endAngle, nbPoints); //todo : change with correct params
-            archBottomPoints = GetArchPoints(bezierPoints[archNum], startWidth + thickness, startAngle, endAngle, nbPoints); //todo : change with correct params
+            Vector3 dir = Vector3.zero;
+            if(archNum == 0)
+            {
+                dir = bezierPoints[1] - bezierPoints[0];
+            }
+            else
+            {
+                dir = bezierPoints[archNum] - bezierPoints[archNum - 1];
+            }
+            archPoints = GetArchPoints(bezierPoints[archNum], dir, startWidth, startAngle, endAngle, nbPoints); //todo : change with correct params
+            archBottomPoints = GetArchPoints(bezierPoints[archNum], dir, startWidth + thickness, startAngle, endAngle, nbPoints); //todo : change with correct params
             if (previousArchPoints.Length != 0)
             {
                 JointTwoArches(ref triangles, ref vertices, previousArchPoints, archPoints);
