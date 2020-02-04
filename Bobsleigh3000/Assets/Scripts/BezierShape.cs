@@ -116,13 +116,12 @@ public class BezierShape : MonoBehaviour
         dir = Vector3.Normalize(dir);
         List<Vector3> points = new List<Vector3>();
         float totalAngle = (endAngle - startAngle);
-        float sign = dir.x > 0 ? -1f : 1f;
         for (int i = 0; i <= nbPoints; i++)
         {
-            float teta = sign * Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
-            Vector3 newPoint = new Vector3(origin.x, (origin.y + radius * Mathf.Sin(teta)), origin.z + radius * Mathf.Cos(teta));
-            Debug.Log(Mathf.Acos(dir.x) * Mathf.Rad2Deg);
-            newPoint = Quaternion.Euler(Mathf.Acos(dir.x) * Mathf.Rad2Deg, 0, 0) * newPoint;
+            float teta = -Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
+            Vector3 newPoint = new Vector3(radius * Mathf.Cos(teta), radius * Mathf.Sin(teta), 0);
+            newPoint = Quaternion.LookRotation(new Vector3(dir.x, dir.y, dir.z)) * newPoint;
+            newPoint += origin;
             points.Add(newPoint);
         }
         return points.ToArray();
