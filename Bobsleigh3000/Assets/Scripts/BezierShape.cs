@@ -1,23 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using System;
 using System.Linq;
+using UnityEngine;
 
 public class BezierShape : MonoBehaviour
 {
     //public params
     public Vector3[] controlPoints;
-    [Range(3,30)]
-    public int nbPoints = 30;
+    [Range(3,300)]
+    public int nbArches = 30;
+    [Range(1,20)]
+    public int nbArchesBakedTogether = 5;
     public float thickness = 0.05f;
     public String matName = "opaqueWhite";
     [Range(0.1f, 2f)]
-    public float startWidth = 1f, endWidth = 1f;
+    public float pipeWidth = 1f, endWidth = 1f;
     [Range(0, 359f)]
-    public float startAngle = 0, endAngle = 180f;
+    public float orientation = 0, totalAngle = 180f;
 
-    Material _shapeMat;
+    public Material shapeMat;
 
     //private params
     double[] FactorialLookup;
@@ -30,7 +32,7 @@ public class BezierShape : MonoBehaviour
 
     private void Awake()
     {
-        _shapeMat = Resources.Load<Material>("Mat/" + matName);
+        shapeMat = Resources.Load<Material>("Mat/" + matName);
     }
 
     /**
@@ -46,9 +48,8 @@ public class BezierShape : MonoBehaviour
     {
         yield return null;
         LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = startWidth;
-        lineRenderer.endWidth = endWidth;
-        lineRenderer.material = _shapeMat;
+        lineRenderer.startWidth = pipeWidth;
+        lineRenderer.material = shapeMat;
         lineRenderer.positionCount = controlPoints.Count();
         lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList()).ToArray());
     }
@@ -59,9 +60,9 @@ public class BezierShape : MonoBehaviour
     List<Vector3> GetBezierPoints(List<Vector3> controlPoints)
     {
         List<Vector3> bezierPoints = new List<Vector3>();
-        for (int i = 0; i < nbPoints; i++)
+        for (int i = 0; i < nbArches; i++)
         {
-            bezierPoints.Add(GetPointAtT(controlPoints.ToArray(), (double)i / (double)nbPoints));
+            bezierPoints.Add(GetPointAtT(controlPoints.ToArray(), (double)i / (double)nbArches));
         }
         return bezierPoints;
     }
@@ -97,28 +98,13 @@ public class BezierShape : MonoBehaviour
     /**
      * Get Arch Point from an Origin, oriented on X axis
      * */
-    public Vector3[] GetArchPoints(Vector3 origin, Vector3 dir, float radius = 1f, float startAngle = 360f, float endAngle = 0, int nbPoints = 16)
+    public static Vector3[] GetArchPoints(Vector3 origin, Vector3 dir, float radius = 1f, float orientation = 0, float totalAngle = 100f, int nbPoints = 16)
     {
-        startAngle = NormalizeDegAngle(startAngle);
-        endAngle = NormalizeDegAngle(endAngle);
-
-        if (endAngle < startAngle)
-        {
-            float tmp = startAngle;
-            startAngle = endAngle;
-            endAngle = tmp;
-        }
-        else
-        if (endAngle == startAngle)
-        {
-            endAngle += 360f;
-        }
         dir = Vector3.Normalize(dir);
         List<Vector3> points = new List<Vector3>();
-        float totalAngle = (endAngle - startAngle);
         for (int i = 0; i <= nbPoints; i++)
         {
-            float teta = -Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
+            float teta = orientation - Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
             Vector3 newPoint = new Vector3(radius * Mathf.Cos(teta), radius * Mathf.Sin(teta), 0);
             newPoint = Quaternion.LookRotation(new Vector3(dir.x, dir.y, dir.z)) * newPoint;
             newPoint += origin;
@@ -127,65 +113,60 @@ public class BezierShape : MonoBehaviour
         return points.ToArray();
     }
 
-    public Mesh GetPipeMeshFromBezier()
+    public void CreatePipeMeshesFromBezier()
     {
-        Vector3[] previousArchPoints = new Vector3[0], previousArchBottomPoints = new Vector3[0];
-        Vector3[] archPoints, archBottomPoints;
         List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
-
-        Mesh _mesh = new Mesh();
-        List<int> triangles = new List<int>();
-        List<Vector3> vertices = new List<Vector3>();
-
+        int minArchNum = 0;
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
-            Vector3 dir = Vector3.zero;
-            if(archNum == 0)
+            if (archNum % nbArchesBakedTogether == 0 || archNum == bezierPoints.Count() - 1)
             {
-                dir = bezierPoints[1] - bezierPoints[0];
+                CreateChildPipe(minArchNum, archNum, bezierPoints, orientation, totalAngle);
+                minArchNum = archNum;
             }
-            else
-            {
-                dir = bezierPoints[archNum] - bezierPoints[archNum - 1];
-            }
-            archPoints = GetArchPoints(bezierPoints[archNum], dir, startWidth, startAngle, endAngle, nbPoints); //todo : change with correct params
-            archBottomPoints = GetArchPoints(bezierPoints[archNum], dir, startWidth + thickness, startAngle, endAngle, nbPoints); //todo : change with correct params
-            if (previousArchPoints.Length != 0)
-            {
-                JointTwoArches(ref triangles, ref vertices, previousArchPoints, archPoints);
-                JointTwoArches(ref triangles, ref vertices, previousArchBottomPoints, archBottomPoints);
-            }
-            previousArchPoints = archPoints;
-            previousArchBottomPoints = archBottomPoints;
-
-
-            JointFrontAndBottomArches(ref triangles, ref vertices, archPoints, archBottomPoints);
         }
-        
-        _mesh.vertices = vertices.ToArray();
-        _mesh.triangles = triangles.ToArray();
-        
-        return _mesh;
     }
 
-    public void CreateMeshPipe()
+    public void CreatePipes(bool destroyChildren = true)
     {
-        if (GetComponent<MeshFilter>())
-        {
-            Destroy(GetComponent<MeshFilter>());
-        }
-        if (GetComponent<MeshRenderer>())
-        {
-            Destroy(GetComponent<MeshRenderer>());
-        }
+        if (destroyChildren)
+            DestroyChildren();
 
-        MeshFilter mf = gameObject.AddComponent<MeshFilter>();
-        MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-        mf.mesh = GetPipeMeshFromBezier();
-        mr.material = _shapeMat;
+        CreatePipeMeshesFromBezier();
     }
 
-    void JointTwoArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] arch1, Vector3[] arch2)
+    void DestroyChildren()
+    {
+        foreach (Transform t in GetComponentsInChildren<Transform>())
+        {
+            if (t == transform)
+                continue;
+            Destroy(t.gameObject);
+        }
+    }
+
+    void CreateChildPipe(int minArchNum, int maxArchNum, List<Vector3> bezierPoints, float startAngle, float endAngle)
+    {
+        if (bezierPoints.Count == 0)
+            return;
+        GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
+        child.transform.parent = transform;
+        CustomPipe cp = child.AddComponent<CustomPipe>();
+        cp.minArchNum = minArchNum;
+        cp.maxArchNum = maxArchNum;
+        cp.startAngle = startAngle;
+        cp.endAngle = endAngle;
+        cp.pipeWidth = pipeWidth;
+        cp.thickness = thickness;
+        cp.bezierPoints = bezierPoints;
+        cp.CreateMesh();
+        //MeshFilter mf = child.AddComponent<MeshFilter>();
+        //MeshRenderer mr = child.AddComponent<MeshRenderer>();
+        //mf.mesh = _mesh;
+        //mr.material = _shapeMat;
+    }
+
+    public static void JointTwoArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] arch1, Vector3[] arch2)
     {
         for (int i = 0; i < arch1.Length - 1; i++)
         {
@@ -217,7 +198,7 @@ public class BezierShape : MonoBehaviour
         }
     }
 
-    void JointFrontAndBottomArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] archPoints, Vector3[] archBottomPoints)
+    public static void JointFrontAndBottomArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] archPoints, Vector3[] archBottomPoints)
     {
         for (int archPointNum = 0; archPointNum < archPoints.Count(); archPointNum++)
         {
@@ -278,7 +259,7 @@ public class BezierShape : MonoBehaviour
     }
 
 
-    float NormalizeDegAngle(float angle)
+    static float NormalizeDegAngle(float angle)
     {
         while (angle < 0)
         {

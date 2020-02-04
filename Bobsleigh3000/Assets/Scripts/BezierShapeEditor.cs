@@ -14,7 +14,7 @@ public class BezierShapeEditor : Editor
             myTarget.DrawBezierCurve();
         } else if (GUILayout.Button("Create Mesh Pipe"))
         {
-            myTarget.CreateMeshPipe();
+            myTarget.CreatePipes();
         }
     }
 }
