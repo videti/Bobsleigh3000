@@ -23,6 +23,9 @@ public class ControlPoints : MonoBehaviour
         {
             Vector3 mouseP = Input.mousePosition;
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Ray ray = Camera.main.ScreenPointToRay(new Vector3(mouseP.x, mouseP.y, 0f));
+            Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, float.PositiveInfinity);
+            Debug.Log(ray.origin +" - "+ ray.direction);
             sphere.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(mouseP.x, mouseP.y, 10f));
             sphere.transform.position = new Vector3(sphere.transform.position.x, sphere.transform.position.y, sphereZPos);
             sphere.transform.localScale = sphereSize * Vector3.one;
