@@ -18,8 +18,10 @@ public class BezierShape : MonoBehaviour
     public float pipeWidth = 1f, endWidth = 1f;
     [Range(0, 359f)]
     public float orientation = 0, totalAngle = 180f;
+    [Range(0.05f, 0.5f)]
+    public float borderWidth = 0.2f, borderHeight = 0.05f;
 
-    public Material shapeMat;
+    public Material shapeMat, borderMat;
 
     //private params
     double[] FactorialLookup;
@@ -32,7 +34,7 @@ public class BezierShape : MonoBehaviour
 
     private void Awake()
     {
-        shapeMat = Resources.Load<Material>("Mat/" + matName);
+        //shapeMat = Resources.Load<Material>("Mat/" + matName);
     }
 
     /**
@@ -130,16 +132,16 @@ public class BezierShape : MonoBehaviour
     public void CreatePipes(bool destroyChildren = true)
     {
         if (destroyChildren)
-            DestroyChildren();
+            DestroyChildren(transform);
 
         CreatePipeMeshesFromBezier();
     }
 
-    void DestroyChildren()
+    public static void DestroyChildren(Transform _transform)
     {
-        foreach (Transform t in GetComponentsInChildren<Transform>())
+        foreach (Transform t in _transform.GetComponentsInChildren<Transform>())
         {
-            if (t == transform)
+            if (t == _transform)
                 continue;
             Destroy(t.gameObject);
         }
@@ -158,95 +160,124 @@ public class BezierShape : MonoBehaviour
         cp.endAngle = endAngle;
         cp.pipeWidth = pipeWidth;
         cp.thickness = thickness;
+        cp.borderHeight = borderHeight;
+        cp.borderWidth = borderWidth;
         cp.bezierPoints = bezierPoints;
         cp.CreateMesh();
-        //MeshFilter mf = child.AddComponent<MeshFilter>();
-        //MeshRenderer mr = child.AddComponent<MeshRenderer>();
-        //mf.mesh = _mesh;
-        //mr.material = _shapeMat;
     }
 
     public static void JointTwoArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] arch1, Vector3[] arch2)
     {
         for (int i = 0; i < arch1.Length - 1; i++)
         {
-            vertices.Add(arch1[i]);
-            vertices.Add(arch1[i + 1]);
-            vertices.Add(arch2[i]);
-            vertices.Add(arch2[i + 1]);
-            int s0_0 = vertices.Count() - 4; //arch0_0
-            int s0_1 = vertices.Count() - 3; //arch0_1
-            int s1_0 = vertices.Count() - 2; //arch1_0
-            int s1_1 = vertices.Count() - 1; //arch1_1
-
-            //two faced
-            triangles.Add(s0_0);
-            triangles.Add(s0_1);
-            triangles.Add(s1_0);
-
-            triangles.Add(s0_0);
-            triangles.Add(s1_0);
-            triangles.Add(s0_1);
-
-            triangles.Add(s1_1);
-            triangles.Add(s1_0);
-            triangles.Add(s0_1);
-
-            triangles.Add(s1_1);
-            triangles.Add(s0_1);
-            triangles.Add(s1_0);
+            AddRecToMesh(
+                ref triangles, ref vertices,
+                arch1[i], arch1[i+1],
+                arch2[i], arch2[i+1]
+            );
         }
     }
 
     public static void JointFrontAndBottomArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] archPoints, Vector3[] archBottomPoints)
     {
-        for (int archPointNum = 0; archPointNum < archPoints.Count(); archPointNum++)
+        for (int archPointNum = 0; archPointNum < archPoints.Count() - 1; archPointNum++)
         {
-            int firstP0 = 0, firstP1 = 0;
-            int s0_0, s0_1, s1_0, s1_1;
-            if (archPointNum != archPoints.Count() - 1)
+            if (archPointNum != archPoints.Count())
             {
-                vertices.Add(archPoints[archPointNum]);
-                vertices.Add(archPoints[archPointNum + 1]);
-                vertices.Add(archBottomPoints[archPointNum]);
-                vertices.Add(archBottomPoints[archPointNum + 1]);
-                s0_0 = vertices.Count() - 4; //arch0_0
-                s0_1 = vertices.Count() - 3; //arch0_1
-                s1_0 = vertices.Count() - 2; //arch1_0
-                s1_1 = vertices.Count() - 1; //arch1_1
-                //premiers points
-                if(archPointNum == 0)
-                {
-                    firstP0 = s0_0;
-                    firstP1 = s1_0;
-                }
-                //two faced
-                triangles.Add(s0_0);
-                triangles.Add(s0_1);
-                triangles.Add(s1_0);
-
-                triangles.Add(s0_0);
-                triangles.Add(s1_0);
-                triangles.Add(s0_1);
-
-                triangles.Add(s1_1);
-                triangles.Add(s1_0);
-                triangles.Add(s0_1);
-
-                triangles.Add(s1_1);
-                triangles.Add(s0_1);
-                triangles.Add(s1_0);
-            } else
-            //derniers points
-            {
-                s0_0 = vertices.Count() - 4; //arch0_0
-                s0_1 = firstP0; //arch0_1
-                s1_0 = vertices.Count() - 2; //arch1_0
-                s1_1 = firstP1; //arch1_1
+                AddRecToMesh(
+                    ref triangles, ref vertices, archPoints[archPointNum], 
+                    archPoints[archPointNum + 1], archBottomPoints[archPointNum], 
+                    archBottomPoints[archPointNum + 1]
+                );
             }
-            
         }
     }
+
+    public static void CreateBordersFromTwoArches
+        (ref List<int> triangles, ref List<Vector3> vertices, Vector3[] archPoints, Vector3[] archBottomPoints, Vector3[] previousArchPoints, Vector3[] previousArchBottomPoints, float borderWidth = 0.1f, float borderHeight = 0.1f, bool noBorderLeft = false, bool noBorderRight = false)
+    {
+        if(previousArchPoints.Length == 0)
+            return;
+        if(!noBorderRight)
+            CreateShapeFromRect(ref triangles, ref vertices, archPoints[0], archBottomPoints[0], previousArchPoints[0], previousArchBottomPoints[0], borderWidth, borderHeight);
+        int lastElem = archPoints.Length - 1;
+        if(!noBorderLeft)
+            CreateShapeFromRect(ref triangles, ref vertices, previousArchPoints[lastElem], previousArchBottomPoints[lastElem], archPoints[lastElem], archBottomPoints[lastElem], borderWidth, borderHeight);
+
+    }
+
+    public static void CreateShapeFromRect (ref List<int> triangles, ref List<Vector3> vertices, Vector3 a, Vector3 b, Vector3 c, Vector3 d, float borderWidth = 0.1f, float borderHeight = 0.1f)
+    {
+        Vector3 ab = b - a;
+        Vector3 ad = d - a;
+        Vector3 a_prim = a + ab * 0.5f - borderWidth * Vector3.Normalize(ab);
+        Vector3 b_prim = a + ab * 0.5f + borderWidth * Vector3.Normalize(ab);
+        Vector3 c_prim = c + ab * 0.5f - borderWidth * Vector3.Normalize(ab);
+        Vector3 d_prim = c + ab * 0.5f + borderWidth * Vector3.Normalize(ab);
+
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            a_prim, b_prim, c_prim, d_prim
+        );
+
+        Vector3 normale = Vector3.Normalize(Vector3.Cross(ab, ad));
+        Vector3 e = a_prim + borderHeight * normale;
+        Vector3 f = b_prim + borderHeight * normale;
+        Vector3 g = c_prim + borderHeight * normale;
+        Vector3 h = d_prim + borderHeight * normale;
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            e, f, g, h
+        );
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            a_prim, b_prim, e, f
+        );
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            b_prim, d_prim, f, h
+        );
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            d_prim, c_prim, h, g
+        );
+        AddRecToMesh(
+            ref triangles, ref vertices,
+            c_prim, a_prim, g, e
+        );
+    }
+
+
+    public static void AddRecToMesh(ref List<int> triangles, ref List<Vector3> vertices, Vector3 v0_0, Vector3 v0_1, Vector3 v1_0, Vector3 v1_1)
+    {
+        int s0_0, s0_1, s1_0, s1_1;
+        vertices.Add(v0_0);
+        vertices.Add(v1_0);
+        vertices.Add(v0_1);
+        vertices.Add(v1_1);
+        s0_0 = vertices.Count() - 4; //arch0_0
+        s0_1 = vertices.Count() - 3; //arch0_1
+        s1_0 = vertices.Count() - 2; //arch1_0
+        s1_1 = vertices.Count() - 1; //arch1_1
+
+        //two faced
+        triangles.Add(s0_0);
+        triangles.Add(s0_1);
+        triangles.Add(s1_0);
+
+        triangles.Add(s0_0);
+        triangles.Add(s1_0);
+        triangles.Add(s0_1);
+
+        triangles.Add(s1_1);
+        triangles.Add(s1_0);
+        triangles.Add(s0_1);
+
+        triangles.Add(s1_1);
+        triangles.Add(s0_1);
+        triangles.Add(s1_0);
+    }
+
 
     Vector3[] GetBottomArchPoints(Vector3[] arch, float thickness = 0.5f)
     {

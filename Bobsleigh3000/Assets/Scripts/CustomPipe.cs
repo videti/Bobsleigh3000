@@ -14,6 +14,9 @@ public class CustomPipe : MonoBehaviour
     public float pipeWidth;
     [Range(0.05f, 1f)]
     public float thickness = 0.2f;
+    [Range(0.05f, 0.5f)]
+    public float borderWidth = 0.2f, borderHeight = 0.05f;
+    public bool noBorderLeft = false, noBorderRight = false;
 
     private void Awake()
     {
@@ -28,6 +31,8 @@ public class CustomPipe : MonoBehaviour
 
         List<int> triangles = new List<int>();
         List<Vector3> vertices = new List<Vector3>();
+        List<int> trianglesBorders = new List<int>();
+        List<Vector3> verticesBorders = new List<Vector3>();
         int nbArches = maxArchNum - minArchNum;
         for (int archNum = minArchNum; archNum <= maxArchNum; archNum++)
         {
@@ -39,8 +44,10 @@ public class CustomPipe : MonoBehaviour
             {
                 BezierShape.JointTwoArches(ref triangles, ref vertices, previousArchPoints, archPoints);
                 BezierShape.JointTwoArches(ref triangles, ref vertices, previousArchBottomPoints, archBottomPoints);
-                BezierShape.JointFrontAndBottomArches(ref triangles, ref vertices, archPoints, archBottomPoints);
+                BezierShape.CreateBordersFromTwoArches(ref trianglesBorders, ref verticesBorders, archPoints, archBottomPoints, previousArchPoints, previousArchBottomPoints, borderWidth, borderHeight, noBorderLeft, noBorderRight);
+                
             }
+            BezierShape.JointFrontAndBottomArches(ref triangles, ref vertices, archPoints, archBottomPoints);
             previousArchPoints = archPoints;
             previousArchBottomPoints = archBottomPoints;
         }
@@ -49,6 +56,19 @@ public class CustomPipe : MonoBehaviour
         _mesh.vertices = vertices.ToArray();
         _mesh.triangles = triangles.ToArray();
         GetComponent<MeshFilter>().sharedMesh = _mesh;
+        Mesh borderMesh = new Mesh();
+        borderMesh.vertices = verticesBorders.ToArray();
+        borderMesh.triangles = trianglesBorders.ToArray();
+        BezierShape.DestroyChildren(transform);
+        GameObject go = new GameObject();
+        MeshFilter childMF = go.AddComponent<MeshFilter>();
+        MeshRenderer childMR = go.AddComponent<MeshRenderer>();
+        childMF.mesh = borderMesh;
+        go.name = name + "_border";
+        go.transform.parent = transform;
+        childMR.material = GetComponentInParent<BezierShape>().borderMat;
+        Destroy(gameObject.GetComponent<MeshCollider>());
+        gameObject.AddComponent<MeshCollider>();
     }
 
     void OnValidate()
