@@ -33,13 +33,13 @@ public class CustomPipe : MonoBehaviour
         List<Vector3> vertices = new List<Vector3>();
         List<int> trianglesBorders = new List<int>();
         List<Vector3> verticesBorders = new List<Vector3>();
-        int nbArches = maxArchNum - minArchNum;
+
         for (int archNum = minArchNum; archNum <= maxArchNum; archNum++)
         {
             Vector3 vecDir = (archNum == 0) ? bezierPoints[1] - bezierPoints[0] : bezierPoints[archNum] - bezierPoints[archNum - 1];
 
-            archPoints = BezierShape.GetArchPoints(bezierPoints[archNum], vecDir, pipeWidth, startAngle, endAngle, nbArches);
-            archBottomPoints = BezierShape.GetArchPoints(bezierPoints[archNum], vecDir, pipeWidth + thickness, startAngle, endAngle, nbArches);
+            archPoints = BezierShape.GetArchPoints(bezierPoints[archNum], vecDir, pipeWidth, startAngle, endAngle, bezierPoints.Count);
+            archBottomPoints = BezierShape.GetArchPoints(bezierPoints[archNum], vecDir, pipeWidth + thickness, startAngle, endAngle, bezierPoints.Count);
             if (archNum != 0)
             {
                 BezierShape.JointTwoArches(ref triangles, ref vertices, previousArchPoints, archPoints);

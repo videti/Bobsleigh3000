@@ -123,6 +123,7 @@ public class BezierShape : MonoBehaviour
         {
             if (archNum % nbArchesBakedTogether == 0 || archNum == bezierPoints.Count() - 1)
             {
+                Debug.Log(bezierPoints.Count);
                 CreateChildPipe(minArchNum, archNum, bezierPoints, orientation, totalAngle);
                 minArchNum = archNum;
             }
