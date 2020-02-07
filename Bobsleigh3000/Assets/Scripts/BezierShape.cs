@@ -20,11 +20,13 @@ public class BezierShape : MonoBehaviour
     public float orientation = 0, totalAngle = 180f;
     [Range(0.05f, 0.5f)]
     public float borderWidth = 0.2f, borderHeight = 0.05f;
-
     public Material shapeMat, borderMat;
 
     //private params
     double[] FactorialLookup;
+
+    [HideInInspector]
+    public int shapeIndex = 0;
 
     //const
     public BezierShape()
@@ -121,9 +123,8 @@ public class BezierShape : MonoBehaviour
         int minArchNum = 0;
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
-            if (archNum % nbArchesBakedTogether == 0 || archNum == bezierPoints.Count() - 1)
+            if (archNum != 0 && archNum % nbArchesBakedTogether == 0 || archNum == bezierPoints.Count() - 1)
             {
-                Debug.Log(bezierPoints.Count);
                 CreateChildPipe(minArchNum, archNum, bezierPoints, orientation, totalAngle);
                 minArchNum = archNum;
             }
@@ -136,6 +137,17 @@ public class BezierShape : MonoBehaviour
             DestroyChildren(transform);
 
         CreatePipeMeshesFromBezier();
+    }
+
+    public void RemoveScripts()
+    {
+        foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
+        {
+            child.SaveAssets();
+            Destroy(child);
+        }
+        Destroy(GetComponent<ControlPoints>());
+        Destroy(this);
     }
 
     public static void DestroyChildren(Transform _transform)
@@ -155,6 +167,7 @@ public class BezierShape : MonoBehaviour
         GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
         child.transform.parent = transform;
         CustomPipe cp = child.AddComponent<CustomPipe>();
+        cp.shapeIndex = shapeIndex;
         cp.minArchNum = minArchNum;
         cp.maxArchNum = maxArchNum;
         cp.startAngle = startAngle;

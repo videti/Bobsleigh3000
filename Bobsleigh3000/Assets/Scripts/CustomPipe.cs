@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshFilter))]
 public class CustomPipe : MonoBehaviour
 {
     [HideInInspector]
@@ -18,11 +21,16 @@ public class CustomPipe : MonoBehaviour
     public float borderWidth = 0.2f, borderHeight = 0.05f;
     public bool noBorderLeft = false, noBorderRight = false;
 
-    private void Awake()
+    [HideInInspector]
+    public int shapeIndex = 0;
+
+    private void Start()
     {
-        gameObject.AddComponent<MeshFilter>();
-        MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-        mr.material = GetComponentInParent<BezierShape>().shapeMat;
+        if(!GetComponent<MeshFilter>())
+            gameObject.AddComponent<MeshFilter>();
+        MeshRenderer mr = (!GetComponent<MeshRenderer>()) ? gameObject.AddComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
+        if(mr != null && GetComponentInParent<BezierShape>() != null && GetComponentInParent<BezierShape>().shapeMat != null)
+            mr.material = GetComponentInParent<BezierShape>().shapeMat;
     }
 
     public void CreateMesh()
@@ -67,13 +75,48 @@ public class CustomPipe : MonoBehaviour
         go.name = name + "_border";
         go.transform.parent = transform;
         childMR.material = GetComponentInParent<BezierShape>().borderMat;
-        Destroy(gameObject.GetComponent<MeshCollider>());
+    }
+
+    public void SaveAssets()
+    {
+        AssetDatabase.CreateAsset(GetComponent<MeshFilter>().sharedMesh, "Assets/Resources/Meshes/" + transform.parent.name + "_" + name + "_mesh.asset");
+        AssetDatabase.CreateAsset(transform.GetChild(0).GetComponent<MeshFilter>().sharedMesh, "Assets/Resources/Meshes/" + transform.parent.name + "_" + transform.GetChild(0).name + "_mesh.asset");
+        AssetDatabase.SaveAssets();
+        foreach (MeshCollider meshCollider in gameObject.GetComponents<MeshCollider>())
+            Destroy(meshCollider);
         gameObject.AddComponent<MeshCollider>();
+        foreach (MeshCollider meshCollider in transform.GetChild(0).GetComponents<MeshCollider>())
+            Destroy(meshCollider);
+        transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
     }
 
     void OnValidate()
     {
-        if(bezierPoints!=null)
-            CreateMesh();
+        if (EditorApplication.isPlaying && bezierPoints != null)
+                CreateMesh();
+    }
+}
+
+
+[CustomEditor(typeof(CustomPipe))]
+public class CustomPipeEditor : Editor
+{
+    Material[] shapeMaterials, borderShapeMaterials;
+    
+    public override void OnInspectorGUI()
+    {
+        CustomPipe myTarget = (CustomPipe)target;
+        if (myTarget.GetComponent<MeshRenderer>() == null)
+            return;
+
+        if (shapeMaterials == null)
+            shapeMaterials = Resources.LoadAll<Material>("Mat/ShapeMat");
+        if (borderShapeMaterials == null)
+            borderShapeMaterials = Resources.LoadAll<Material>("Mat/BorderShapeMat");
+        string[] matNames = shapeMaterials.Select(x => x.name).ToArray();
+        myTarget.shapeIndex = EditorGUILayout.Popup(myTarget.shapeIndex, matNames);
+        myTarget.GetComponent<MeshRenderer>().material = shapeMaterials[myTarget.shapeIndex];
+        myTarget.transform.GetChild(0).GetComponent<MeshRenderer>().material = borderShapeMaterials[myTarget.shapeIndex];
+        DrawDefaultInspector();
     }
 }
