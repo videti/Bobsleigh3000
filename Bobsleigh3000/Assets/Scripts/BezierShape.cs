@@ -23,16 +23,10 @@ public class BezierShape : MonoBehaviour
     public Material shapeMat, borderMat;
 
     //private params
-    double[] FactorialLookup;
+    static double[] FactorialLookup = new double[0];
 
     [HideInInspector]
     public int shapeIndex = 0;
-
-    //const
-    public BezierShape()
-    {
-        CreateFactorialTable();
-    }
 
     private void Awake()
     {
@@ -66,7 +60,7 @@ public class BezierShape : MonoBehaviour
         List<Vector3> bezierPoints = new List<Vector3>();
         for (int i = 0; i < nbArches; i++)
         {
-            bezierPoints.Add(GetPointAtT(controlPoints.ToArray(), (double)i / (double)nbArches));
+            bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)nbArches));
         }
         return bezierPoints;
     }
@@ -77,8 +71,11 @@ public class BezierShape : MonoBehaviour
      * n = nb total points
      * t = float between 0 and 1 (x axis)
      * */
-    double BernsteinPolynom(int i, int n, double t)
+    static double BernsteinPolynom(int i, int n, double t)
     {
+        Debug.Log(i);
+        Debug.Log(n);
+
         double result = factorial(n) / (factorial(i) * factorial(n - i));
         result *= Math.Pow(t, i) * Math.Pow(1f - t, n - i);
         return result;
@@ -87,14 +84,14 @@ public class BezierShape : MonoBehaviour
     /**
      * Get bezier point coordonates from control points list
      * */
-    Vector3 GetPointAtT(Vector3[] points, double t)
+    public static Vector3 GetBezierCurvePointAtT(Vector3[] ctrlPoints, double t)
     {
-        int n = points.Length;
+        int n = ctrlPoints.Length;
         Vector3 bPoint = Vector3.zero;
-        for (int i = 0; i < points.Length; i++)
+        for (int i = 0; i < ctrlPoints.Length; i++)
         {
             double b_i = BernsteinPolynom(i, n - 1, t);
-            bPoint += new Vector3((float)(points[i].x * b_i), (float)(points[i].y * b_i), (float)(points[i].z * b_i));
+            bPoint += new Vector3((float)(ctrlPoints[i].x * b_i), (float)(ctrlPoints[i].y * b_i), (float)(ctrlPoints[i].z * b_i));
         }
         return bPoint;
     }
@@ -110,7 +107,7 @@ public class BezierShape : MonoBehaviour
         {
             float teta = orientation - Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
             Vector3 newPoint = new Vector3(radius * Mathf.Cos(teta), radius * Mathf.Sin(teta), 0);
-            newPoint = Quaternion.LookRotation(new Vector3(dir.x, dir.y, dir.z)) * newPoint;
+            newPoint = Quaternion.LookRotation(dir) * newPoint;
             newPoint += origin;
             points.Add(newPoint);
         }
@@ -120,6 +117,9 @@ public class BezierShape : MonoBehaviour
     public void CreatePipeMeshesFromBezier()
     {
         List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
+
+        GameObject.FindObjectOfType<FollowingBezierCurve>().ctrlPoints = controlPoints;
+
         int minArchNum = 0;
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
@@ -323,8 +323,10 @@ public class BezierShape : MonoBehaviour
      * */
 
     // just check if n is appropriate, then return the result
-    private double factorial(int n)
+    private static double factorial(int n)
     {
+        if (FactorialLookup.Length == 0)
+            CreateFactorialTable();
         if (n < 0) { throw new Exception("n is less than 0"); }
         if (n > 32) { throw new Exception("n is greater than 32"); }
 
@@ -332,7 +334,7 @@ public class BezierShape : MonoBehaviour
     }
 
     // create lookup table for fast factorial calculation
-    private void CreateFactorialTable()
+    private static void CreateFactorialTable()
     {
         // fill untill n=32. The rest is too high to represent
         double[] a = new double[33];
