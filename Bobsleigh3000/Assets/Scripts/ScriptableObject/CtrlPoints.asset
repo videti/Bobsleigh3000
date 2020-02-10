@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61dbe2d416aecfc46888cef54bbb56ce, type: 3}
+  m_Name: CtrlPoints
+  m_EditorClassIdentifier: 
+  ctrlPoints:
+  - {x: -27.86408, y: 11.84466, z: 0}
+  - {x: -16.08414, y: -14.69256, z: 0}
+  - {x: 13.81877, y: -13.20388, z: 0}
+  - {x: 14.33657, y: 13.33333, z: 0}

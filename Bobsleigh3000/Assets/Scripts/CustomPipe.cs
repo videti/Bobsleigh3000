@@ -36,9 +36,10 @@ public class CustomPipe : MonoBehaviour
     public void CreateMesh()
     {
         Vector3[] archPoints, archBottomPoints, previousArchPoints = new Vector3[0], previousArchBottomPoints = new Vector3[0];
-
+        //pipe mesh params
         List<int> triangles = new List<int>();
         List<Vector3> vertices = new List<Vector3>();
+        //border mesh params
         List<int> trianglesBorders = new List<int>();
         List<Vector3> verticesBorders = new List<Vector3>();
 
@@ -84,10 +85,12 @@ public class CustomPipe : MonoBehaviour
         AssetDatabase.SaveAssets();
         foreach (MeshCollider meshCollider in gameObject.GetComponents<MeshCollider>())
             Destroy(meshCollider);
-        gameObject.AddComponent<MeshCollider>();
+        //gameObject.AddComponent<MeshCollider>();
         foreach (MeshCollider meshCollider in transform.GetChild(0).GetComponents<MeshCollider>())
             Destroy(meshCollider);
         transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+        //layer obstacle = 9
+        transform.GetChild(0).gameObject.layer = 9;
     }
 
     void OnValidate()

@@ -9,6 +9,8 @@ public class ControlPoints : MonoBehaviour
     [Range(-9, 9)]
     public float sphereZPos = 1f;
 
+    public ScriptableControlPoints savedControlPoints;
+
 
     // Start is called before the first frame update
     void Start()
@@ -52,5 +54,21 @@ public class ControlPoints : MonoBehaviour
         BezierShape bz = gameObject.AddComponent<BezierShape>();
         bz.controlPoints = controlPoints.ToArray();
         Destroy(this);
+    }
+
+
+    public void RegenerateSphereFromSavedCtrlPoints()
+    {
+        BezierShape.DestroyChildren(transform);
+
+        Vector3[] controlPoints = savedControlPoints.ctrlPoints;
+        foreach(Vector3 point in controlPoints)
+        {
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.position = point;
+            sphere.transform.localScale = sphereSize * Vector3.one;
+            sphere.transform.parent = transform;
+            sphere.name = "s" + transform.childCount;
+        }
     }
 }

@@ -73,9 +73,6 @@ public class BezierShape : MonoBehaviour
      * */
     static double BernsteinPolynom(int i, int n, double t)
     {
-        Debug.Log(i);
-        Debug.Log(n);
-
         double result = factorial(n) / (factorial(i) * factorial(n - i));
         result *= Math.Pow(t, i) * Math.Pow(1f - t, n - i);
         return result;
@@ -118,8 +115,6 @@ public class BezierShape : MonoBehaviour
     {
         List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
 
-        GameObject.FindObjectOfType<FollowingBezierCurve>().ctrlPoints = controlPoints;
-
         int minArchNum = 0;
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
         {
@@ -137,6 +132,11 @@ public class BezierShape : MonoBehaviour
             DestroyChildren(transform);
 
         CreatePipeMeshesFromBezier();
+    }
+
+    public void SaveModel()
+    {
+        GameObject.FindObjectOfType<FollowingBezierCurve>().scriptableControl.ctrlPoints = controlPoints;
     }
 
     public void RemoveScripts()

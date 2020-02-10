@@ -33,6 +33,11 @@ public class BezierShapeEditor : Editor
         //phase post-creation
         else
         {
+            //save control point scriptable model
+            if (GUILayout.Button("Save scriptable points as model"))
+            {
+                myTarget.SaveModel();
+            }
             //save mesh and remove scripts
             if (GUILayout.Button("Remove All Scripts and Save Meshes"))
             {
