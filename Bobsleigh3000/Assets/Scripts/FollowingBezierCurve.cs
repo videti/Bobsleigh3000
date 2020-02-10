@@ -53,7 +53,6 @@ public class FollowingBezierCurve : MonoBehaviour
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
         speed += -dir.y * accelerateForce * Time.deltaTime;
         speed = Mathf.Min(Mathf.Max(0.05f, speed), 3f);
-        Debug.Log(speed);
 
         //position sur l'arc de cercle autour de l'origine
         Vector3 newPosition = new Vector3(radius * Mathf.Cos(angle * Mathf.Deg2Rad), radius * Mathf.Sin(angle * Mathf.Deg2Rad), 0);
@@ -69,20 +68,39 @@ public class FollowingBezierCurve : MonoBehaviour
         thirdPersonCam.transform.position = origin + thirdPersonCam.transform.rotation * localCamPos;
         thirdPersonCam.transform.LookAt(thirdPersonCam.transform.position + dir * 10f);
         thirdPersonCam.transform.Rotate(30f, 0, 0);
+
+        if (Input.GetMouseButtonDown(0))
+            Clicked();
     }
 
-    private void OnMouseDown()
+    private void CheckClick()
     {
-        Ray ray = thirdPersonCam.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log(hit.collider);
-            //ground touched
-            if(hit.collider.gameObject.layer == 10)
+            Debug.Log(Input.mousePosition);
+            
+            Ray ray = thirdPersonCam.ViewportPointToRay(thirdPersonCam.ScreenToViewportPoint(Input.mousePosition));
+            RaycastHit hit;
+            Debug.DrawRay(ray.origin, ray.direction, Color.red, Mathf.Infinity);
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 10))
             {
+                Debug.Log(hit.collider);
+                //ground touched
                 Debug.Log("ground touched");
             }
+        }
+    }
+
+    void Clicked()
+    {
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit hit = new RaycastHit();
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log(hit.collider.gameObject.name);
+            Debug.Log(hit.collider.gameObject.layer);
         }
     }
 }
