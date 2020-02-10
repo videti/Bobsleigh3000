@@ -22,6 +22,9 @@ public class BezierShape : MonoBehaviour
     public float borderWidth = 0.2f, borderHeight = 0.05f;
     public Material shapeMat, borderMat;
 
+    public int startChildIndex, endChildIndex;
+    public float shiftingValue;
+
     //private params
     static double[] FactorialLookup = new double[0];
 
@@ -178,6 +181,23 @@ public class BezierShape : MonoBehaviour
         cp.borderWidth = borderWidth;
         cp.bezierPoints = bezierPoints;
         cp.CreateMesh();
+    }
+
+    public void ShiftingChildrenDepth(int startChildIndex, int endChildIndex, float shiftingValue = 2f)
+    {
+        if (transform.childCount < endChildIndex + 1)
+            return;
+
+        if (endChildIndex <= startChildIndex)
+            return;
+
+        float firstChildPosZ = transform.GetChild(startChildIndex).transform.position.z;
+
+        for (int i = 1; i <= endChildIndex - startChildIndex; i++)
+        {
+            Transform childTransform = transform.GetChild(i + startChildIndex).transform;
+            childTransform.position = new Vector3(childTransform.position.x, childTransform.position.y, firstChildPosZ + i * shiftingValue);
+        }
     }
 
     public static void JointTwoArches(ref List<int> triangles, ref List<Vector3> vertices, Vector3[] arch1, Vector3[] arch2)

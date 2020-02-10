@@ -64,4 +64,9 @@ public class AdjustRotation : MonoBehaviour
 
         return rotateZToUp * rotateYToZ;
     }
+
+    private void OnMouseDown()
+    {
+        
+    }
 }

@@ -6,10 +6,21 @@ using System.Linq;
 public class BezierShapeEditor : Editor
 {
     Material[] shapeMaterials, borderShapeMaterials;
+    SerializedProperty startChildIndex, endChildIndex, shiftingValue;
+
+    void OnEnable()
+    {
+        startChildIndex = serializedObject.FindProperty("startChildIndex");
+        endChildIndex = serializedObject.FindProperty("endChildIndex");
+        shiftingValue = serializedObject.FindProperty("shiftingValue");
+    }
 
     public override void OnInspectorGUI()
     {
         BezierShape myTarget = (BezierShape)target;
+
+
+
 
         //phase pre-creation
         if (myTarget.GetComponentInChildren<CustomPipe>() == null)
@@ -46,5 +57,14 @@ public class BezierShapeEditor : Editor
         }
 
         DrawDefaultInspector();
+
+        if (myTarget.GetComponentInChildren<CustomPipe>() == null)
+        {
+            EditorGUILayout.Space(10f, true);
+            if (GUILayout.Button("Shifting Pipe"))
+            {
+                myTarget.ShiftingChildrenDepth(startChildIndex.intValue, endChildIndex.intValue, shiftingValue.floatValue);
+            }
+        }
     }
 }

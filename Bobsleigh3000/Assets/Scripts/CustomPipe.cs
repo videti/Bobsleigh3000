@@ -31,6 +31,8 @@ public class CustomPipe : MonoBehaviour
         MeshRenderer mr = (!GetComponent<MeshRenderer>()) ? gameObject.AddComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
         if(mr != null && GetComponentInParent<BezierShape>() != null && GetComponentInParent<BezierShape>().shapeMat != null)
             mr.material = GetComponentInParent<BezierShape>().shapeMat;
+        //set the ground layer = 10
+        gameObject.layer = 10;
     }
 
     public void CreateMesh()
