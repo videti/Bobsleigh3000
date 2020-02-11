@@ -62,7 +62,7 @@ public class CustomPipe : MonoBehaviour
             previousArchPoints = archPoints;
             previousArchBottomPoints = archBottomPoints;
         }
-
+        BezierShape.DestroyChildren(transform);
         Mesh _mesh = new Mesh();
         _mesh.vertices = vertices.ToArray();
         _mesh.triangles = triangles.ToArray();
@@ -70,7 +70,7 @@ public class CustomPipe : MonoBehaviour
         Mesh borderMesh = new Mesh();
         borderMesh.vertices = verticesBorders.ToArray();
         borderMesh.triangles = trianglesBorders.ToArray();
-        BezierShape.DestroyChildren(transform);
+        
         GameObject go = new GameObject();
         MeshFilter childMF = go.AddComponent<MeshFilter>();
         MeshRenderer childMR = go.AddComponent<MeshRenderer>();
@@ -98,7 +98,7 @@ public class CustomPipe : MonoBehaviour
     void OnValidate()
     {
         if (EditorApplication.isPlaying && bezierPoints != null)
-                CreateMesh();
+            CreateMesh();
     }
 }
 

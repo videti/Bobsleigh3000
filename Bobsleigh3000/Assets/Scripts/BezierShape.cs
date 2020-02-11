@@ -197,6 +197,7 @@ public class BezierShape : MonoBehaviour
         {
             Transform childTransform = transform.GetChild(i + startChildIndex).transform;
             childTransform.position = new Vector3(childTransform.position.x, childTransform.position.y, firstChildPosZ + i * shiftingValue);
+            controlPoints[i] = childTransform.position;
         }
     }
 
