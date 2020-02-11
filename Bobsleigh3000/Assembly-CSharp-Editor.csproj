@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Editor\DWGEditor.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Editor\ClearUnusedAttributes.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Editor\CreateShadowObject.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Editor\CustomAction.cs" />

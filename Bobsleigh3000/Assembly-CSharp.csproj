@@ -65,6 +65,14 @@
   <ItemGroup>
     <Compile Include="Assets\Boost.cs" />
     <Compile Include="Assets\ClearMesh.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGBuilder.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGColliderEnabler.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGCreateBrick.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGDestroyer.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGPhysicsCheck.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGTagManager.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\Example\Scripts\CameraFreeRoam.cs" />
+    <Compile Include="Assets\DestructibleWallGenerator\Example\Scripts\ThrowObject.cs" />
     <Compile Include="Assets\FarlandSkies\Demo\Scripts\Player\FPSWalkerEnhanced.cs" />
     <Compile Include="Assets\FarlandSkies\Demo\Scripts\Player\SmoothMouseLook.cs" />
     <Compile Include="Assets\FarlandSkies\Demo\Scripts\Skybox\SkyboxChanger.cs" />
@@ -109,6 +117,7 @@
     <None Include="Assets\Shader\triplanar.shader" />
     <None Include="Assets\ProCore\ProBuilder\Shader\pb_NormalPreview.shader" />
     <None Include="Assets\ProCore\ProBuilder\About\changelog.txt" />
+    <None Include="Assets\DestructibleWallGenerator\DWG\Documentation\ReadMe.txt" />
     <None Include="Assets\ProCore\ProBuilder\Shader\pb_TransparentOverlay.shader" />
     <None Include="Assets\ProCore\ProBuilder\Shader\pb_SelectionPicker.shader" />
     <None Include="Assets\ProCore\ProBuilder\Shader\DiffuseVertexColor.shader" />

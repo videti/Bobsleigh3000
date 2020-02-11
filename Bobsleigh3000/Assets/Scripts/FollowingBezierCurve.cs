@@ -13,6 +13,8 @@ public class FollowingBezierCurve : MonoBehaviour
     public float totalTime = 30f; //the time to finish the game if speed = 1
     [Range(0.01f, 3f)]
     public float frontSpeed = 1f; //default front speed
+    [Range(0.01f, 3f)]
+    public float minFrontSpeed = 0.3f; //min front speed
     [Range(1f, 20f)]
     public float lateralSpeed = 3f; //to change the angle
     [Range(0.1f, 20f)]
@@ -56,8 +58,13 @@ public class FollowingBezierCurve : MonoBehaviour
 
     private void OnDisable()
     {
-        if(thirdPersonCam!= null)
-            thirdPersonCam.enabled = false;
+        //if(thirdPersonCam!= null)
+        //    thirdPersonCam.enabled = false;
+    }
+
+    public void AddTimeToTimeBuffer(float time)
+    {
+        timeBuffer += time;
     }
 
     // Update is called once per frame
@@ -70,8 +77,13 @@ public class FollowingBezierCurve : MonoBehaviour
         nextOrigin = BezierShape.GetBezierCurvePointAtT(scriptableControl.ctrlPoints, timeBuffer);
         //dir => le vecteur directeur entre le point t et t+1
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
-        frontSpeed += -dir.y * accelerateForce * Time.deltaTime * frontSpeed;
+        if(frontSpeed > minFrontSpeed || dir.y <= 0)
+            frontSpeed += -dir.y * accelerateForce * Time.deltaTime * frontSpeed;
         frontSpeed = Mathf.Min(Mathf.Max(0.05f, frontSpeed), 3f);
+        if(frontSpeed < minFrontSpeed)
+        {
+            frontSpeed += Time.deltaTime * accelerateForce;
+        }
 
         //position sur l'arc de cercle autour de l'origine
         Vector3 newPosition = new Vector3(radius * Mathf.Cos(angle * Mathf.Deg2Rad), radius * Mathf.Sin(angle * Mathf.Deg2Rad), 0);
