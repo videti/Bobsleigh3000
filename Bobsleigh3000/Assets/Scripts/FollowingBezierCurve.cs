@@ -13,9 +13,12 @@ public class FollowingBezierCurve : MonoBehaviour
     [Range(0f, 1.5f)]
     public float radius = 1f;
     public float accelerateForce = 3f;
+    public float moveSpeed = 300f;
+    public float maxDistanceToClick = 5f;
 
 
     public Vector3 localCamPos = new Vector3(0, 0.8f, -0.8f);
+    public float localCamRotationX = 25f;
 
     public Camera thirdPersonCam;
     float timeBuffer = 0f;
@@ -67,40 +70,27 @@ public class FollowingBezierCurve : MonoBehaviour
         //on replace la caméra
         thirdPersonCam.transform.position = origin + thirdPersonCam.transform.rotation * localCamPos;
         thirdPersonCam.transform.LookAt(thirdPersonCam.transform.position + dir * 10f);
-        thirdPersonCam.transform.Rotate(30f, 0, 0);
+        thirdPersonCam.transform.Rotate(localCamRotationX, 0, 0);
 
-        if (Input.GetMouseButtonDown(0))
-            Clicked();
+        //handle click
+        if (Input.GetMouseButton(0))
+            ClickOnGround();
     }
 
-    private void CheckClick()
+    //adjust angle when a click on ground is performed
+    void ClickOnGround()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Debug.Log(Input.mousePosition);
-            
-            Ray ray = thirdPersonCam.ViewportPointToRay(thirdPersonCam.ScreenToViewportPoint(Input.mousePosition));
-            RaycastHit hit;
-            Debug.DrawRay(ray.origin, ray.direction, Color.red, Mathf.Infinity);
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 10))
-            {
-                Debug.Log(hit.collider);
-                //ground touched
-                Debug.Log("ground touched");
-            }
-        }
-    }
-
-    void Clicked()
-    {
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var ray = thirdPersonCam.ScreenPointToRay( Input.mousePosition);
 
         RaycastHit hit = new RaycastHit();
 
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, 10))
         {
-            Debug.Log(hit.collider.gameObject.name);
-            Debug.Log(hit.collider.gameObject.layer);
+            if (hit.distance <= maxDistanceToClick)
+            {
+                float signedDifAngle = Vector3.SignedAngle(-transform.up, -hit.normal, transform.forward);
+                angle += signedDifAngle * moveSpeed * Time.deltaTime;
+            }
         }
     }
 }
