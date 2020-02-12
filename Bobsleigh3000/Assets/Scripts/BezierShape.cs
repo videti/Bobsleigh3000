@@ -24,6 +24,7 @@ public class BezierShape : MonoBehaviour
 
     public int startChildIndex, endChildIndex;
     public float shiftingValue;
+    ScriptableControlPoints scriptableControlPoints;
 
     //private params
     static double[] FactorialLookup = new double[0];
@@ -34,6 +35,7 @@ public class BezierShape : MonoBehaviour
     private void Awake()
     {
         //shapeMat = Resources.Load<Material>("Mat/" + matName);
+        scriptableControlPoints = GameObject.FindObjectOfType<FollowingBezierCurve>().scriptableControl;
     }
 
     /**
@@ -144,9 +146,24 @@ public class BezierShape : MonoBehaviour
 
     public void RemoveScripts()
     {
+        scriptableControlPoints.pipesParams = new List<ScriptableControlPoints.PipeParams>();
+        List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
         foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
         {
             child.SaveAssets();
+            ScriptableControlPoints.PipeParams pipeParams = new ScriptableControlPoints.PipeParams();
+            pipeParams.bezierPoints = bezierPoints.ToArray();
+            pipeParams.minArchNum = child.minArchNum;
+            pipeParams.maxArchNum = child.maxArchNum;
+            pipeParams.startAngle = child.startAngle;
+            pipeParams.endAngle = child.endAngle;
+            pipeParams.pipeWidth = child.pipeWidth;
+            pipeParams.thickness = child.thickness;
+            pipeParams.borderWidth = child.borderWidth;
+            pipeParams.noBorderLeft = child.noBorderLeft;
+            pipeParams.noBorderRight = child.noBorderRight;
+            pipeParams.shapeIndex = child.shapeIndex;
+            scriptableControlPoints.pipesParams.Add(pipeParams);
             Destroy(child);
         }
         Destroy(GetComponent<ControlPoints>());

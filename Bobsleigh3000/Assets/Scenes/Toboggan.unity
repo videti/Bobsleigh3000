@@ -1971,7 +1971,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh13530
+  m_Name: pb_Mesh13818
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11843,7 +11843,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &641842290
 Transform:
   m_ObjectHideFlags: 0
@@ -12485,7 +12485,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 9.71e-43, y: NaN, z: 9.71e-43, w: 9.807996e-33}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -23633,7 +23633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1699592246
 Transform:
   m_ObjectHideFlags: 0
@@ -28493,6 +28493,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Shape1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8133402992871389418, guid: 1d598b51dfd0c6c4b95686e4624ba861,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d598b51dfd0c6c4b95686e4624ba861, type: 3}

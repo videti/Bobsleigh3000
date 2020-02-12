@@ -16,5 +16,10 @@ public class ControlPointsEditor : Editor
         {
             myTarget.GenerateBezierShapeScript();
         }
+
+        if (GUILayout.Button("Generate Pipes from Saved Params"))
+        {
+            myTarget.GeneratePipesFromSavedParams();
+        }
     }
 }

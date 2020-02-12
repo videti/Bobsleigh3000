@@ -77,7 +77,14 @@ public class CustomPipe : MonoBehaviour
         childMF.mesh = borderMesh;
         go.name = name + "_border";
         go.transform.parent = transform;
-        childMR.material = GetComponentInParent<BezierShape>().borderMat;
+
+            MeshRenderer mr = (!GetComponent<MeshRenderer>()) ? gameObject.AddComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
+            Material[] shapeMaterials, borderShapeMaterials;
+            shapeMaterials = Resources.LoadAll<Material>("Mat/ShapeMat");
+            borderShapeMaterials = Resources.LoadAll<Material>("Mat/BorderShapeMat");
+            mr.material = shapeMaterials[shapeIndex];
+            transform.GetChild(0).GetComponent<MeshRenderer>().material = borderShapeMaterials[shapeIndex];
+
     }
 
     public void SaveAssets()

@@ -71,4 +71,28 @@ public class ControlPoints : MonoBehaviour
             sphere.name = "s" + transform.childCount;
         }
     }
+
+    public void GeneratePipesFromSavedParams()
+    {
+        foreach (ScriptableControlPoints.PipeParams param in savedControlPoints.pipesParams)
+        {
+            GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
+            child.transform.parent = transform;
+            CustomPipe cp = child.AddComponent<CustomPipe>();
+            cp.shapeIndex = param.shapeIndex;
+            cp.minArchNum = param.minArchNum;
+            cp.maxArchNum = param.maxArchNum;
+            cp.startAngle = param.startAngle;
+            cp.endAngle = param.endAngle;
+            cp.pipeWidth = param.pipeWidth;
+            cp.thickness = param.thickness;
+            cp.borderHeight = param.borderHeight;
+            cp.borderWidth = param.borderWidth;
+            cp.bezierPoints = param.bezierPoints.ToList();
+            cp.CreateMesh();
+        }
+        BezierShape bz = gameObject.AddComponent<BezierShape>();
+        bz.controlPoints = savedControlPoints.ctrlPoints;
+        Destroy(this);
+    }
 }
