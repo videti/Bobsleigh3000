@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class BezierShape : MonoBehaviour
@@ -142,6 +143,38 @@ public class BezierShape : MonoBehaviour
     public void SaveModel()
     {
         GameObject.FindObjectOfType<FollowingBezierCurve>().scriptableControl.ctrlPoints = controlPoints;
+        ScriptableControlPoints scriptable = ScriptableObject.CreateInstance<ScriptableControlPoints>();
+        scriptable.ctrlPoints = controlPoints;
+        scriptable.pipesParams = new List<ScriptableControlPoints.PipeParams>();
+        foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
+        {
+            foreach (MeshCollider meshCollider in child.gameObject.GetComponents<MeshCollider>())
+                Destroy(meshCollider);
+            //gameObject.AddComponent<MeshCollider>();
+            foreach (MeshCollider meshCollider in child.transform.GetChild(0).GetComponents<MeshCollider>())
+                Destroy(meshCollider);
+            child.transform.GetChild(0).gameObject.AddComponent<MeshCollider>();
+            //layer obstacle = 9
+            child.transform.GetChild(0).gameObject.layer = 9;
+
+            ScriptableControlPoints.PipeParams pipeParams = new ScriptableControlPoints.PipeParams();
+            pipeParams.bezierPoints = child.bezierPoints.ToArray();
+            pipeParams.minArchNum = child.minArchNum;
+            pipeParams.maxArchNum = child.maxArchNum;
+            pipeParams.startAngle = child.startAngle;
+            pipeParams.endAngle = child.endAngle;
+            pipeParams.pipeWidth = child.pipeWidth;
+            pipeParams.thickness = child.thickness;
+            pipeParams.borderWidth = child.borderWidth;
+            pipeParams.noBorderLeft = child.noBorderLeft;
+            pipeParams.noBorderRight = child.noBorderRight;
+            pipeParams.shapeIndex = child.shapeIndex;
+            scriptable.pipesParams.Add(pipeParams);
+        }
+        AssetDatabase.CreateAsset(scriptable, "Assets/Scripts/ScriptableObject/scriptableControlPoints_"+ Mathf.Round(Time.time * 10000f) + ".asset");
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorUtility.SetDirty(scriptable);
     }
 
     public void RemoveScripts()
