@@ -90,6 +90,7 @@ public class ControlPoints : MonoBehaviour
             cp.borderWidth = param.borderWidth;
             cp.bezierPoints = param.bezierPoints.ToList();
             cp.CreateMesh();
+            child.AddComponent<MeshCollider>();
         }
         BezierShape bz = gameObject.AddComponent<BezierShape>();
         bz.controlPoints = savedControlPoints.ctrlPoints;

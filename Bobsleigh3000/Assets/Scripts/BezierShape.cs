@@ -55,18 +55,18 @@ public class BezierShape : MonoBehaviour
         lineRenderer.startWidth = pipeWidth;
         lineRenderer.material = shapeMat;
         lineRenderer.positionCount = controlPoints.Count();
-        lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList()).ToArray());
+        lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList(), nbArches).ToArray());
     }
 
     /**
      * Get all bezier points coordonates
      * */
-    List<Vector3> GetBezierPoints(List<Vector3> controlPoints)
+    public static List<Vector3> GetBezierPoints(List<Vector3> controlPoints, int _nbArches)
     {
         List<Vector3> bezierPoints = new List<Vector3>();
-        for (int i = 0; i < nbArches; i++)
+        for (int i = 0; i < _nbArches; i++)
         {
-            bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)nbArches));
+            bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)_nbArches));
         }
         return bezierPoints;
     }
@@ -119,7 +119,7 @@ public class BezierShape : MonoBehaviour
 
     public void CreatePipeMeshesFromBezier()
     {
-        List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
+        List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList(), nbArches);
 
         int minArchNum = 0;
         for (int archNum = 0; archNum < bezierPoints.Count(); archNum++)
@@ -180,7 +180,7 @@ public class BezierShape : MonoBehaviour
     public void RemoveScripts()
     {
         scriptableControlPoints.pipesParams = new List<ScriptableControlPoints.PipeParams>();
-        List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList());
+        List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList(), nbArches);
         foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
         {
             child.SaveAssets();
