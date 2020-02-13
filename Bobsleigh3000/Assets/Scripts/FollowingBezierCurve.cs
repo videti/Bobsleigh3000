@@ -112,7 +112,7 @@ public class FollowingBezierCurve : MonoBehaviour
         transform.LookAt(transform.position + dir * 10f);
         transform.position = newPosition;
         transform.localRotation = Quaternion.Euler(transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, angle + 90f);
-        transform.Translate(tobogganGenerator.translations[currentPartIndex]);
+        //transform.Translate(tobogganGenerator.translations[currentPartIndex]);
 
         //on replace la caméra
         thirdPersonCam.transform.position = origin + thirdPersonCam.transform.rotation * localCamPos;

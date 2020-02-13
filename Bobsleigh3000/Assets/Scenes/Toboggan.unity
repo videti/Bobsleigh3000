@@ -29434,9 +29434,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tobogganParts:
-  - {fileID: 11400000, guid: 763d5e4c392eb8949be8864cec1d7640, type: 2}
-  - {fileID: 11400000, guid: f2f2fb1e7c8e5ce4cbcd2805f2f5f3bd, type: 2}
-  - {fileID: 11400000, guid: 763d5e4c392eb8949be8864cec1d7640, type: 2}
+  - {fileID: 11400000, guid: e3ec8e50dd1f73141bc59cdaad98f773, type: 2}
+  - {fileID: 11400000, guid: 624a2640609c6c8499fab385012615bc, type: 2}
   translations: []
   nbArches: 50
 --- !u!4 &2128377447

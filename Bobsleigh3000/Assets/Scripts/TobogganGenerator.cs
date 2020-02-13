@@ -36,7 +36,7 @@ public class TobogganGenerator : MonoBehaviour
             List<Vector3> newBezierPoints = new List<Vector3>();
             for (int k = 0; k < tobogganParts[i].pipesParams[0].bezierPoints.Length; k++)
             {
-                newBezierPoints.Add(tobogganParts[i].pipesParams[0].bezierPoints[k] + translations[i]);
+                newBezierPoints.Add(tobogganParts[i].pipesParams[0].bezierPoints[k]);
             }
 
             foreach (ScriptableControlPoints.PipeParams param in tobogganParts[i].pipesParams)
