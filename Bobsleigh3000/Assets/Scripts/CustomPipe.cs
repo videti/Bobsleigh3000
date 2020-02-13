@@ -35,7 +35,7 @@ public class CustomPipe : MonoBehaviour
         gameObject.layer = 10;
     }
 
-    public void CreateMesh(Vector3[] controlPoints = null, int nbarches = 100)
+    public void CreateMesh()
     {
         Vector3[] archPoints, archBottomPoints, previousArchPoints = new Vector3[0], previousArchBottomPoints = new Vector3[0];
         //pipe mesh params
@@ -44,11 +44,6 @@ public class CustomPipe : MonoBehaviour
         //border mesh params
         List<int> trianglesBorders = new List<int>();
         List<Vector3> verticesBorders = new List<Vector3>();
-
-        if (controlPoints != null)
-        {
-            bezierPoints = BezierShape.GetBezierPoints(controlPoints.ToList(), nbarches);
-        }
 
         for (int archNum = minArchNum; archNum <= maxArchNum; archNum++)
         {

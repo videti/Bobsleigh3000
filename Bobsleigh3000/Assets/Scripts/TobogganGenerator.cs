@@ -9,20 +9,24 @@ public class TobogganGenerator : MonoBehaviour
     public ScriptableControlPoints[] tobogganParts;
     public int nbArches = 100;
     
+    // joint different bezier curve together
     public void GeneratePipes()
     {
         for (int i = 0; i < tobogganParts.Length; i++)
         {
             int previousIndex = Mathf.Max(0, i - 1);
-            Vector3 lastPointPreviousPart = tobogganParts[previousIndex].ctrlPoints[tobogganParts[previousIndex].ctrlPoints.Length - 1];
-            Vector3 translation = lastPointPreviousPart - tobogganParts[i].ctrlPoints[0];
-            for (int j = 0; j < tobogganParts[i].ctrlPoints.Length; j++)
-            {
-                tobogganParts[i].ctrlPoints[j] += translation;
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere.transform.position = tobogganParts[i].ctrlPoints[j];
-            }
+            int nbPipesParamsPreviousPart = tobogganParts[previousIndex].pipesParams.Count;
+            int nbBezierPointsPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints.Length;
+            Vector3 lastBezierPointPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints[nbBezierPointsPreviousPart - 1];
+            Vector3 translation = lastBezierPointPreviousPart - tobogganParts[i].pipesParams[0].bezierPoints[0];
 
+            for (int j = 0; j < tobogganParts[i].pipesParams.Count; j++)
+            {
+                for (int k = 0; k < tobogganParts[i].pipesParams[j].bezierPoints.Length; k++)
+                {
+                    tobogganParts[i].pipesParams[j].bezierPoints[k] += translation;
+                }
+            }
             foreach (ScriptableControlPoints.PipeParams param in tobogganParts[i].pipesParams)
             {
                 GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
@@ -37,7 +41,8 @@ public class TobogganGenerator : MonoBehaviour
                 cp.thickness = param.thickness;
                 cp.borderHeight = param.borderHeight;
                 cp.borderWidth = param.borderWidth;
-                cp.CreateMesh(tobogganParts[i].ctrlPoints, nbArches);
+                cp.bezierPoints = tobogganParts[i].pipesParams[0].bezierPoints.ToList();
+                cp.CreateMesh();
                 child.AddComponent<MeshCollider>();
             }
             BezierShape bz = gameObject.AddComponent<BezierShape>();
