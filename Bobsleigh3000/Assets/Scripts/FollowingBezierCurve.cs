@@ -88,12 +88,10 @@ public class FollowingBezierCurve : MonoBehaviour
         }
         //origin (x, y z) est un point de la courbe à l'instant t
         origin = nextOrigin == Vector3.zero ? BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer) : nextOrigin;
-        origin += tobogganGenerator.translations[currentPartIndex];
-        
+
 
         //nextOrigin (x, y z) est un point de la courbe à l'instant t + delta
         nextOrigin = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer);
-        nextOrigin += tobogganGenerator.translations[currentPartIndex] * 0.1f;
 
         //dir => le vecteur directeur entre le point t et t+1
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
@@ -114,6 +112,7 @@ public class FollowingBezierCurve : MonoBehaviour
         transform.LookAt(transform.position + dir * 10f);
         transform.position = newPosition;
         transform.localRotation = Quaternion.Euler(transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, angle + 90f);
+        transform.Translate(tobogganGenerator.translations[currentPartIndex]);
 
         //on replace la caméra
         thirdPersonCam.transform.position = origin + thirdPersonCam.transform.rotation * localCamPos;

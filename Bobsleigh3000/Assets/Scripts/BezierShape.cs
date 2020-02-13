@@ -57,6 +57,28 @@ public class BezierShape : MonoBehaviour
         lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList(), nbArches).ToArray());
     }
 
+    public static List<Vector3> GetChaikinPoints(List<Vector3> controlPoints, int _nbArches)
+    {
+        List<Vector3> chaikinPoints = new List<Vector3>(controlPoints);
+        for(int index = 0; index < 8; index ++)
+        {
+            List<Vector3> tmpPoints = new List<Vector3>();
+            Vector3 p_n = Vector3.zero;
+            Vector3 p_n2 = Vector3.zero;
+            for (int i = 1; i < chaikinPoints.Count; i++)
+            {
+                p_n = chaikinPoints[i - 1];
+                p_n2 = chaikinPoints[i];
+                Vector3 dif = p_n2 - p_n;
+                tmpPoints.Add(p_n + 0.25f * dif);
+                tmpPoints.Add(p_n + 0.75f * dif);
+            }
+            chaikinPoints = tmpPoints;
+        }
+        return chaikinPoints;
+    }
+
+
     /**
      * Get all bezier points coordonates
      * */
