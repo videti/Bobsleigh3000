@@ -35,8 +35,7 @@ public class BezierShape : MonoBehaviour
 
     private void Awake()
     {
-        //shapeMat = Resources.Load<Material>("Mat/" + matName);
-        scriptableControlPoints = GameObject.FindObjectOfType<FollowingBezierCurve>().scriptableControl;
+        //scriptableControlPoints = GameObject.FindObjectOfType<FollowingBezierCurve>().scriptablesControls[0];
     }
 
     /**
@@ -142,7 +141,6 @@ public class BezierShape : MonoBehaviour
 
     public void SaveModel()
     {
-        GameObject.FindObjectOfType<FollowingBezierCurve>().scriptableControl.ctrlPoints = controlPoints;
         ScriptableControlPoints scriptable = ScriptableObject.CreateInstance<ScriptableControlPoints>();
         scriptable.ctrlPoints = controlPoints;
         scriptable.pipesParams = new List<ScriptableControlPoints.PipeParams>();

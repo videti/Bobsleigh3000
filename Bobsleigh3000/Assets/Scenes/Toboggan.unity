@@ -5747,12 +5747,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 297528981}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b8344845b2120224cb2fe6b7df112d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scriptableControl: {fileID: 11400000, guid: 1c59fcdb1840e524d945d1a746882bb2, type: 2}
   totalTime: 20
   frontSpeed: 0.05
   minFrontSpeed: 0.5
@@ -5819,7 +5818,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 297528981}
   m_LocalRotation: {x: 0.4185874, y: 0.50781226, z: -0.3089576, w: 0.686627}
-  m_LocalPosition: {x: -22.736982, y: 9.722687, z: 0.9309386}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 5006512736432479645}
@@ -29435,8 +29434,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tobogganParts:
-  - {fileID: 11400000, guid: c4e8435d664eaf449847014a9356fab5, type: 2}
-  - {fileID: 11400000, guid: 0c1a7d672aacb9e48902fbf4a63f9aa8, type: 2}
+  - {fileID: 11400000, guid: 763d5e4c392eb8949be8864cec1d7640, type: 2}
+  - {fileID: 11400000, guid: f2f2fb1e7c8e5ce4cbcd2805f2f5f3bd, type: 2}
+  - {fileID: 11400000, guid: 763d5e4c392eb8949be8864cec1d7640, type: 2}
+  translations: []
   nbArches: 50
 --- !u!4 &2128377447
 Transform:

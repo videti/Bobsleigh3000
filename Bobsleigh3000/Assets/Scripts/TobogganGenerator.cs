@@ -7,26 +7,38 @@ using UnityEngine;
 public class TobogganGenerator : MonoBehaviour
 {
     public ScriptableControlPoints[] tobogganParts;
+    public Vector3[] translations;
     public int nbArches = 100;
-    
+
+    private void Awake()
+    {
+        translations = new Vector3[tobogganParts.Length];
+    }
+
     // joint different bezier curve together
     public void GeneratePipes()
     {
         for (int i = 0; i < tobogganParts.Length; i++)
         {
-            int previousIndex = Mathf.Max(0, i - 1);
-            int nbPipesParamsPreviousPart = tobogganParts[previousIndex].pipesParams.Count;
-            int nbBezierPointsPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints.Length;
-            Vector3 lastBezierPointPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints[nbBezierPointsPreviousPart - 1];
-            Vector3 translation = lastBezierPointPreviousPart - tobogganParts[i].pipesParams[0].bezierPoints[0];
-
-            for (int j = 0; j < tobogganParts[i].pipesParams.Count; j++)
+            if (i == 0)
             {
-                for (int k = 0; k < tobogganParts[i].pipesParams[j].bezierPoints.Length; k++)
-                {
-                    tobogganParts[i].pipesParams[j].bezierPoints[k] += translation;
-                }
+                translations[i] = -tobogganParts[i].pipesParams[0].bezierPoints[0];
             }
+            else
+            {
+                int previousIndex = i - 1;
+                int nbPipesParamsPreviousPart = tobogganParts[previousIndex].pipesParams.Count;
+                int nbBezierPointsPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints.Length;
+                Vector3 lastBezierPointPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints[nbBezierPointsPreviousPart - 1];
+                translations[i] = lastBezierPointPreviousPart - tobogganParts[i].pipesParams[0].bezierPoints[0] + translations[i - 1];
+            }
+
+            List<Vector3> newBezierPoints = new List<Vector3>();
+            for (int k = 0; k < tobogganParts[i].pipesParams[0].bezierPoints.Length; k++)
+            {
+                newBezierPoints.Add(tobogganParts[i].pipesParams[0].bezierPoints[k] + translations[i]);
+            }
+
             foreach (ScriptableControlPoints.PipeParams param in tobogganParts[i].pipesParams)
             {
                 GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
@@ -41,14 +53,14 @@ public class TobogganGenerator : MonoBehaviour
                 cp.thickness = param.thickness;
                 cp.borderHeight = param.borderHeight;
                 cp.borderWidth = param.borderWidth;
-                cp.bezierPoints = tobogganParts[i].pipesParams[0].bezierPoints.ToList();
+                cp.bezierPoints = newBezierPoints;
                 cp.CreateMesh();
-                child.AddComponent<MeshCollider>();
+                //child.AddComponent<MeshCollider>();
             }
-            BezierShape bz = gameObject.AddComponent<BezierShape>();
-            bz.controlPoints = tobogganParts[i].ctrlPoints;
+            //BezierShape bz = gameObject.AddComponent<BezierShape>();
+            //bz.controlPoints = tobogganParts[i].ctrlPoints;
         }
-        Destroy(this);
+        //Destroy(this);
     }
 }
 

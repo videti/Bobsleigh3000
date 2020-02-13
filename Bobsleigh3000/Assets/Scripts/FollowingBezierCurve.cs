@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FollowingBezierCurve : MonoBehaviour
 {
-    [Header("Control Points Array")]
-    public ScriptableControlPoints scriptableControl;
+    //[Header("Control Points Array")]
+    //public ScriptableControlPoints[] scriptablesControls;
     [Space()]
     [Header("Game General Params")]
     //game general params
@@ -44,9 +44,13 @@ public class FollowingBezierCurve : MonoBehaviour
     float currentJumpForce;
     float timeBuffer = 0f;
     Vector3 origin, nextOrigin;
+    int currentPartIndex = 0;
+
+    TobogganGenerator tobogganGenerator;
 
     private void Start()
     {
+        tobogganGenerator = GameObject.FindObjectOfType<TobogganGenerator>();
         nextOrigin = Vector3.zero;
         currentJumpForce = initialForce;
     }
@@ -70,11 +74,27 @@ public class FollowingBezierCurve : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //origin (x, y z) est un point de la courbe à l'instant t
-        origin = nextOrigin == Vector3.zero ? BezierShape.GetBezierCurvePointAtT(scriptableControl.ctrlPoints, timeBuffer) : nextOrigin;
+        if(tobogganGenerator.transform.childCount == 0)
+        {
+            return;
+        }
         timeBuffer += frontSpeed * Time.deltaTime / totalTime;
+        if(timeBuffer >= 1f)
+        {
+            timeBuffer -= 1f;
+            currentPartIndex++;
+            if (currentPartIndex >= tobogganGenerator.tobogganParts.Length)
+                currentPartIndex = 0;
+        }
+        //origin (x, y z) est un point de la courbe à l'instant t
+        origin = nextOrigin == Vector3.zero ? BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer) : nextOrigin;
+        origin += tobogganGenerator.translations[currentPartIndex];
+        
+
         //nextOrigin (x, y z) est un point de la courbe à l'instant t + delta
-        nextOrigin = BezierShape.GetBezierCurvePointAtT(scriptableControl.ctrlPoints, timeBuffer);
+        nextOrigin = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer);
+        nextOrigin += tobogganGenerator.translations[currentPartIndex] * 0.1f;
+
         //dir => le vecteur directeur entre le point t et t+1
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
         if(frontSpeed > minFrontSpeed || dir.y <= 0)
