@@ -18,14 +18,12 @@ public class TobogganGenerator : MonoBehaviour
     // joint different bezier curve together
     public void GeneratePipes()
     {
+        translations[0] = -tobogganParts[0].pipesParams[0].bezierPoints[0];
         for (int i = 0; i < tobogganParts.Length; i++)
         {
-            if (i == 0)
+            if (i != 0)
             {
                 translations[i] = -tobogganParts[i].pipesParams[0].bezierPoints[0];
-            }
-            else
-            {
                 int previousIndex = i - 1;
                 int nbPipesParamsPreviousPart = tobogganParts[previousIndex].pipesParams.Count;
                 int nbBezierPointsPreviousPart = tobogganParts[previousIndex].pipesParams[nbPipesParamsPreviousPart - 1].bezierPoints.Length;
@@ -36,7 +34,7 @@ public class TobogganGenerator : MonoBehaviour
             List<Vector3> newBezierPoints = new List<Vector3>();
             for (int k = 0; k < tobogganParts[i].pipesParams[0].bezierPoints.Length; k++)
             {
-                newBezierPoints.Add(tobogganParts[i].pipesParams[0].bezierPoints[k]);
+                newBezierPoints.Add(tobogganParts[i].pipesParams[0].bezierPoints[k] + translations[i]);
             }
 
             foreach (ScriptableControlPoints.PipeParams param in tobogganParts[i].pipesParams)
