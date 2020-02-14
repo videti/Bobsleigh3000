@@ -44,12 +44,10 @@ public class ControlPoints : MonoBehaviour
     {
         List<Vector3> controlPoints = new List<Vector3>();
         Transform[] children = transform.GetComponentsInChildren<Transform>();
-        children.ToList().Sort((x, y) => string.Compare(x.name, y.name));
-        foreach (Transform child in children)
+        //children.ToList().Sort((x, y) => string.Compare(x.name, y.name));
+        for (int i = 0; i < transform.childCount; i++)
         {
-            if (transform == child)
-                continue;
-            controlPoints.Add(child.position);
+            controlPoints.Add(transform.GetChild(i).position);
         }
         BezierShape bz = gameObject.AddComponent<BezierShape>();
         bz.controlPoints = controlPoints.ToArray();

@@ -22901,7 +22901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sphereSize: 1
   sphereZPos: 1
-  savedControlPoints: {fileID: 11400000, guid: 1c59fcdb1840e524d945d1a746882bb2, type: 2}
+  savedControlPoints: {fileID: 0}
 --- !u!43 &1742671880
 Mesh:
   m_ObjectHideFlags: 0
@@ -29434,10 +29434,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tobogganParts:
-  - {fileID: 11400000, guid: e3ec8e50dd1f73141bc59cdaad98f773, type: 2}
-  - {fileID: 11400000, guid: e3ec8e50dd1f73141bc59cdaad98f773, type: 2}
+  - {fileID: 11400000, guid: 1634dadc67337524ebaa56b83efea6ce, type: 2}
   translations: []
-  nbArches: 50
+  nbArches: 150
 --- !u!4 &2128377447
 Transform:
   m_ObjectHideFlags: 0

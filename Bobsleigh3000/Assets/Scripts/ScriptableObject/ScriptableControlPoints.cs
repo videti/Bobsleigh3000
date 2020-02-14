@@ -14,7 +14,7 @@ public class ScriptableControlPoints : ScriptableObject
         public int minArchNum, maxArchNum;
         public float startAngle, endAngle;
         public float pipeWidth;
-        public float thickness ;
+        public float thickness;
         public float borderWidth, borderHeight;
         public bool noBorderLeft, noBorderRight;
         public int shapeIndex;

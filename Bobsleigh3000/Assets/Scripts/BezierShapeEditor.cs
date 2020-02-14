@@ -19,9 +19,6 @@ public class BezierShapeEditor : Editor
     {
         BezierShape myTarget = (BezierShape)target;
 
-
-
-
         //phase pre-creation
         if (myTarget.GetComponentInChildren<CustomPipe>() == null)
         {

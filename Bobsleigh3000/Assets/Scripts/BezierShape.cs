@@ -120,21 +120,26 @@ public class BezierShape : MonoBehaviour
         return bPoint;
     }
 
+    static Vector3 previousdir = Vector3.zero;
     /**
      * Get Arch Point from an Origin, oriented on X axis
      * */
-    public static Vector3[] GetArchPoints(Vector3 origin, Vector3 dir, float radius = 1f, float orientation = 0, float totalAngle = 100f, int nbPoints = 16)
+    public static Vector3[] GetArchPoints(Vector3 origin, Vector3 dir, float radius = 1f, float orientation = 0, float totalAngle = 359f, int nbPoints = 16)
     {
         dir = Vector3.Normalize(dir);
         List<Vector3> points = new List<Vector3>();
+        Debug.Log(dir);
         for (int i = 0; i <= nbPoints; i++)
         {
             float teta = orientation - Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
             Vector3 newPoint = new Vector3(radius * Mathf.Cos(teta), radius * Mathf.Sin(teta), 0);
+            //if (Mathf.Sign(previousdir.x) != Mathf.Sign(dir.x))
+            //    dir *= -1;
             newPoint = Quaternion.LookRotation(dir) * newPoint;
             newPoint += origin;
             points.Add(newPoint);
         }
+        previousdir = dir;
         return points.ToArray();
     }
 
@@ -166,8 +171,9 @@ public class BezierShape : MonoBehaviour
         ScriptableControlPoints scriptable = ScriptableObject.CreateInstance<ScriptableControlPoints>();
         scriptable.ctrlPoints = controlPoints;
         scriptable.pipesParams = new List<ScriptableControlPoints.PipeParams>();
-        foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
+        for (int i = 0; i < transform.childCount; i++)
         {
+            CustomPipe child  = transform.GetChild(i).GetComponent<CustomPipe>();
             foreach (MeshCollider meshCollider in child.gameObject.GetComponents<MeshCollider>())
                 Destroy(meshCollider);
             //gameObject.AddComponent<MeshCollider>();
