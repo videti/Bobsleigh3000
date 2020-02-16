@@ -1505,7 +1505,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh13472
+  m_Name: pb_Mesh13576
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1831,7 +1831,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh13818
+  m_Name: pb_Mesh13728
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -5752,7 +5752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8344845b2120224cb2fe6b7df112d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalTime: 10
+  totalTime: 15
   frontSpeed: 0.05
   minFrontSpeed: 0.5
   lateralSpeed: 3
@@ -5796,7 +5796,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 1
+  m_CollisionDetection: 3
 --- !u!114 &297528985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5836,8 +5836,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.5280484, y: 0.4091099, z: 1}
-  m_Center: {x: -0.0064498475, y: 0.31144014, z: -0.0000012527678}
+  m_Size: {x: 0.51801777, y: 0.97004116, z: 1}
+  m_Center: {x: -0.011465279, y: 0.030972496, z: -0.0000013110091}
 --- !u!43 &368147658
 Mesh:
   m_ObjectHideFlags: 0
@@ -10716,7 +10716,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh13498
+  m_Name: pb_Mesh13628
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -10879,7 +10879,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh13554
+  m_Name: pb_Mesh13812
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -11522,7 +11522,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &641842290
 Transform:
   m_ObjectHideFlags: 0
@@ -22022,7 +22022,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1592260988
 Transform:
   m_ObjectHideFlags: 0
@@ -22901,7 +22901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sphereSize: 1
   sphereZPos: 1
-  savedControlPoints: {fileID: 11400000, guid: 80baf24b924f7ec4286e15b868f02c7c, type: 2}
+  savedControlPoints: {fileID: 0}
 --- !u!43 &1742671880
 Mesh:
   m_ObjectHideFlags: 0
@@ -29434,9 +29434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tobogganParts:
-  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
-  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
-  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
+  - {fileID: 11400000, guid: 267524e63eb1a7740932b9d14dd157a7, type: 2}
   translations: []
   rotations: []
   nbArches: 51
@@ -31017,8 +31015,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5.038699, y: 5.948954, z: 7.914458}
-  m_Center: {x: 0.038043268, y: 2.0255425, z: 1.0427371}
+  m_Size: {x: 5.038699, y: 9.704461, z: 7.914458}
+  m_Center: {x: 0.038043257, y: 0.14778754, z: 1.0427371}
 --- !u!1 &8404232992183479014
 GameObject:
   m_ObjectHideFlags: 0

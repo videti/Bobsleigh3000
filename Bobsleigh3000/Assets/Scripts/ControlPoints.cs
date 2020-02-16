@@ -30,7 +30,8 @@ public class ControlPoints : MonoBehaviour
             sphere.transform.position = new Vector3(sphere.transform.position.x, sphere.transform.position.y, sphereZPos);
             sphere.transform.localScale = sphereSize * Vector3.one;
             sphere.transform.parent = transform;
-            sphere.name = "s" + transform.childCount;
+            string num = transform.childCount < 10 ? "0" + transform.childCount : transform.childCount+"";
+            sphere.name = "s" + num;
         }
         if (Input.GetMouseButtonDown(1))
         {
@@ -44,9 +45,10 @@ public class ControlPoints : MonoBehaviour
     {
         List<Vector3> controlPoints = new List<Vector3>();
         Transform[] children = transform.GetComponentsInChildren<Transform>();
-        //children.ToList().Sort((x, y) => string.Compare(x.name, y.name));
+        children.ToList().Sort((x, y) => string.Compare(x.name, y.name));
         for (int i = 0; i < transform.childCount; i++)
         {
+            Debug.Log(transform.GetChild(i).name);
             controlPoints.Add(transform.GetChild(i).position);
         }
         BezierShape bz = gameObject.AddComponent<BezierShape>();
@@ -60,20 +62,23 @@ public class ControlPoints : MonoBehaviour
         BezierShape.DestroyChildren(transform);
 
         Vector3[] controlPoints = savedControlPoints.ctrlPoints;
-        foreach(Vector3 point in controlPoints)
+        for (int i = 0; i < controlPoints.Length; i++)
         {
+            Vector3 point = controlPoints[i];
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.transform.position = point;
             sphere.transform.localScale = sphereSize * Vector3.one;
             sphere.transform.parent = transform;
-            sphere.name = "s" + transform.childCount;
+            string num = transform.childCount < 10 ? "0" + transform.childCount : transform.childCount + "";
+            sphere.name = "s" + num;
         }
     }
 
     public void GeneratePipesFromSavedParams()
     {
-        foreach (ScriptableControlPoints.PipeParams param in savedControlPoints.pipesParams)
+        for (int i = 0; i < savedControlPoints.pipesParams.Count; i++)
         {
+            ScriptableControlPoints.PipeParams param = savedControlPoints.pipesParams[i];
             GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
             child.transform.parent = transform;
             CustomPipe cp = child.AddComponent<CustomPipe>();

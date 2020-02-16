@@ -33,50 +33,45 @@ public class BezierShape : MonoBehaviour
     [HideInInspector]
     public int shapeIndex = 0;
 
-    private void Awake()
-    {
-        //scriptableControlPoints = GameObject.FindObjectOfType<FollowingBezierCurve>().scriptablesControls[0];
-    }
-
     /**
      * Create a LineRenderer with the bezier points
      * */
-    public void DrawBezierCurve()
-    {
-        Destroy(GetComponent<LineRenderer>());
-        StartCoroutine(CreateLineRenderer());
-    }
+    //public void DrawBezierCurve()
+    //{
+    //    Destroy(GetComponent<LineRenderer>());
+    //    StartCoroutine(CreateLineRenderer());
+    //}
 
-    IEnumerator CreateLineRenderer()
-    {
-        yield return null;
-        LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = pipeWidth;
-        lineRenderer.material = shapeMat;
-        lineRenderer.positionCount = controlPoints.Count();
-        lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList(), nbArches).ToArray());
-    }
+    //IEnumerator CreateLineRenderer()
+    //{
+    //    yield return null;
+    //    LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
+    //    lineRenderer.startWidth = pipeWidth;
+    //    lineRenderer.material = shapeMat;
+    //    lineRenderer.positionCount = controlPoints.Count();
+    //    lineRenderer.SetPositions(GetBezierPoints(controlPoints.ToList(), nbArches).ToArray());
+    //}
 
-    public static List<Vector3> GetChaikinPoints(List<Vector3> controlPoints, int _nbArches)
-    {
-        List<Vector3> chaikinPoints = new List<Vector3>(controlPoints);
-        for(int index = 0; index < 8; index ++)
-        {
-            List<Vector3> tmpPoints = new List<Vector3>();
-            Vector3 p_n = Vector3.zero;
-            Vector3 p_n2 = Vector3.zero;
-            for (int i = 1; i < chaikinPoints.Count; i++)
-            {
-                p_n = chaikinPoints[i - 1];
-                p_n2 = chaikinPoints[i];
-                Vector3 dif = p_n2 - p_n;
-                tmpPoints.Add(p_n + 0.25f * dif);
-                tmpPoints.Add(p_n + 0.75f * dif);
-            }
-            chaikinPoints = tmpPoints;
-        }
-        return chaikinPoints;
-    }
+    //public static List<Vector3> GetChaikinPoints(List<Vector3> controlPoints, int _nbArches)
+    //{
+    //    List<Vector3> chaikinPoints = new List<Vector3>(controlPoints);
+    //    for(int index = 0; index < 8; index ++)
+    //    {
+    //        List<Vector3> tmpPoints = new List<Vector3>();
+    //        Vector3 p_n = Vector3.zero;
+    //        Vector3 p_n2 = Vector3.zero;
+    //        for (int i = 1; i < chaikinPoints.Count; i++)
+    //        {
+    //            p_n = chaikinPoints[i - 1];
+    //            p_n2 = chaikinPoints[i];
+    //            Vector3 dif = p_n2 - p_n;
+    //            tmpPoints.Add(p_n + 0.25f * dif);
+    //            tmpPoints.Add(p_n + 0.75f * dif);
+    //        }
+    //        chaikinPoints = tmpPoints;
+    //    }
+    //    return chaikinPoints;
+    //}
 
 
     /**
@@ -87,7 +82,6 @@ public class BezierShape : MonoBehaviour
         List<Vector3> bezierPoints = new List<Vector3>();
         for (int i = 0; i < _nbArches; i++)
         {
-            Debug.Log((double)i / (double)(_nbArches - 1));
             bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)(_nbArches - 1)));
         }
         return bezierPoints;
@@ -207,8 +201,9 @@ public class BezierShape : MonoBehaviour
     {
         scriptableControlPoints.pipesParams = new List<ScriptableControlPoints.PipeParams>();
         List<Vector3> bezierPoints = GetBezierPoints(controlPoints.ToList(), nbArches);
-        foreach (CustomPipe child in GetComponentsInChildren<CustomPipe>())
+        for (int i = 0; i < transform.childCount; i++)
         {
+            CustomPipe child = transform.GetChild(i).GetComponent<CustomPipe>();
             child.SaveAssets();
             ScriptableControlPoints.PipeParams pipeParams = new ScriptableControlPoints.PipeParams();
             pipeParams.bezierPoints = bezierPoints.ToArray();
@@ -243,7 +238,8 @@ public class BezierShape : MonoBehaviour
     {
         if (bezierPoints.Count == 0)
             return;
-        GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
+        string num = transform.childCount < 10 ? "0" + transform.childCount : transform.childCount + "";
+        GameObject child = new GameObject("Pipe_" + num);
         child.transform.parent = transform;
         CustomPipe cp = child.AddComponent<CustomPipe>();
         cp.shapeIndex = shapeIndex;
@@ -273,7 +269,7 @@ public class BezierShape : MonoBehaviour
         {
             Transform childTransform = transform.GetChild(i + startChildIndex).transform;
             childTransform.position = new Vector3(childTransform.position.x, childTransform.position.y, firstChildPosZ + i * shiftingValue);
-            controlPoints[i] = childTransform.position;
+            controlPoints[i + startChildIndex] = childTransform.position;
         }
     }
 

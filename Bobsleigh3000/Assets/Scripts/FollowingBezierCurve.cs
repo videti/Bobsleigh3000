@@ -90,15 +90,15 @@ public class FollowingBezierCurve : MonoBehaviour
             }
             else
             {
-                timeBuffer = 0f;
-                Vector3 estimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex - 1].ctrlPoints, 1f);
-                estimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex - 1] * estimatedBezierPoint + tobogganGenerator.translations[currentPartIndex - 1];
-                Vector3 newEstimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, 0f);
-                newEstimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex] * newEstimatedBezierPoint + tobogganGenerator.translations[currentPartIndex];
+                timeBuffer -= 1f;
+                //Vector3 estimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex - 1].ctrlPoints, 1f);
+                //estimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex - 1] * estimatedBezierPoint + tobogganGenerator.translations[currentPartIndex - 1];
+                //Vector3 newEstimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, 0f);
+                //newEstimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex] * newEstimatedBezierPoint + tobogganGenerator.translations[currentPartIndex];
 
-                Debug.Log(estimatedBezierPoint);
-                Debug.Log(newEstimatedBezierPoint);
-                Debug.Log(Vector3.Distance(estimatedBezierPoint, newEstimatedBezierPoint));
+                //Debug.Log(estimatedBezierPoint);
+                //Debug.Log(newEstimatedBezierPoint);
+                //Debug.Log(Vector3.Distance(estimatedBezierPoint, newEstimatedBezierPoint));
             }
             
         }

@@ -8,7 +8,6 @@ public class HandlePlayerCollisions : MonoBehaviour
     FollowingBezierCurve playerController;
     Rigidbody rigidBody;
     FollowingBezierCurve followingBezierCurve;
-    List<GameObject> groundTriggerList = new List<GameObject>();
 
     private void Start()
     {
@@ -22,24 +21,14 @@ public class HandlePlayerCollisions : MonoBehaviour
         if(other.tag == "Boost")
         {
             playerController.frontSpeed = Mathf.Max(playerController.frontSpeed, boostSpeed);
-        } else if(other.gameObject.layer == 10)
-        {
-            groundTriggerList.Add(other.gameObject);
         }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.layer == 10)
+        else
+        if(other.tag == "Hole")
         {
-            groundTriggerList.Remove(other.gameObject);
-            if(groundTriggerList.Count == 0 && followingBezierCurve.jumping == false)
-            {
-                rigidBody.isKinematic = false;
-                rigidBody.constraints = RigidbodyConstraints.None;
-                followingBezierCurve.enabled = false;
-                Invoke("ResetFall", 2f);
-            }
+            rigidBody.isKinematic = false;
+            rigidBody.constraints = RigidbodyConstraints.None;
+            followingBezierCurve.enabled = false;
+            Invoke("ResetFall", 2f);
         }
     }
 
