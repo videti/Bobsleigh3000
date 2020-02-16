@@ -86,6 +86,11 @@ public class TobogganGenerator : MonoBehaviour
         PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, "Assets/Toboggan/Toboggan_" + Mathf.Round(Time.time * 10000f) + ".prefab", InteractionMode.AutomatedAction);
     }
 
+    public void SavePrefab()
+    {
+        PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, "Assets/Toboggan/"+name+ ".prefab", InteractionMode.AutomatedAction);
+    }
+
     public void SetAllBorderWidth(float width)
     {
         for (int i = 0; i < tobogganParts.Length; i++)
@@ -132,46 +137,10 @@ public class TobogganGeneratorEditor : Editor
             if (GUILayout.Button("Disable Scripts and Save asset"))
             {
                 myTarget.DisableCustomPipes();
+            } else if (GUILayout.Button("Save prefab only"))
+            {
+                myTarget.SavePrefab();
             }
         }
     }
 }
-
-/** boosts
- * 
- * 21.75 -12.59 -0.2430819
- * 0 0 -37
- * 
- * ---------
- * 
- * 26.8 -16.45 0.4
- * -29.3 41.22 -51.89
- * 
- * ---------
- *  
- * 33.1 -22.382 -0.784
- * 22.8 -29.7 -50.6
- *  
- *  pipe 10 disabled
- *  
- *  Wall
- *  96.71 -40.53 -50.32
- *  11.9 94.16601 0.392
- *  
- *  101.32 -41.77 -49.58
- *  11.9 94.16601 0.392
- *  
- *  118.88 -47.86 -50.87
- *  11.9 94.16601 0.392
- *  
- *  Boost
- *  107.18 -44.31 -50.4
- *  0 4.1 -18.6
- *  
- *  Wall
- *  127.6 -47.84 -50.56
- *  11.9 94.16601 0.392
- *  
- *  131.99 -47.13 -47.95
- *  11.9 37.78 0.392
- */

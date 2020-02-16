@@ -5,19 +5,27 @@ using UnityEngine;
 public class AutoLoadMesh : MonoBehaviour
 {
     MeshFilter meshFilter;
+    MeshCollider meshCollider;
+    Mesh _mesh;
+
+    private void Awake()
+    {
+        _mesh = Resources.Load<Mesh>("Meshes/TobogganGenerator_" + name + "_mesh");
+        meshFilter = GetComponent<MeshFilter>();
+        meshCollider = GetComponent<MeshCollider>();
+    }
 
     // Start is called before the first frame update
-    void Start()
+    void Update()
     {
-        meshFilter = GetComponent<MeshFilter>();
+        
         if (meshFilter.sharedMesh == null)
         {
-            meshFilter.sharedMesh =  Resources.Load<Mesh>("Meshes/TobogganGenerator_" + name + "_mesh");
-            foreach(MeshCollider meshCollider in GetComponents<MeshCollider>())
-            {
-                Destroy(meshCollider);
-            }
-            gameObject.AddComponent<MeshCollider>();
+            meshFilter.sharedMesh = _mesh;
+        }
+        if (meshCollider.sharedMesh == null)
+        {
+            meshCollider.sharedMesh = _mesh;
         }
     }
 }
