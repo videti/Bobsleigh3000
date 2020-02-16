@@ -5752,13 +5752,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8344845b2120224cb2fe6b7df112d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalTime: 20
+  totalTime: 10
   frontSpeed: 0.05
   minFrontSpeed: 0.5
   lateralSpeed: 3
   lateralGravityForce: 0.5
   angle: -90.359795
-  radius: 1
+  radius: 1.05
   accelerateForce: 1
   maxDistanceToClick: 5
   thirdPersonCam: {fileID: 641842291}
@@ -11522,7 +11522,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &641842290
 Transform:
   m_ObjectHideFlags: 0
@@ -12144,7 +12144,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 8.5e-43, y: NaN, z: 8.5e-43, w: -1.6206571e+24}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -22901,7 +22901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sphereSize: 1
   sphereZPos: 1
-  savedControlPoints: {fileID: 0}
+  savedControlPoints: {fileID: 11400000, guid: 80baf24b924f7ec4286e15b868f02c7c, type: 2}
 --- !u!43 &1742671880
 Mesh:
   m_ObjectHideFlags: 0
@@ -29434,9 +29434,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tobogganParts:
-  - {fileID: 11400000, guid: 1634dadc67337524ebaa56b83efea6ce, type: 2}
+  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
+  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
+  - {fileID: 11400000, guid: 537960ec323c81645b3cfab53056b5ce, type: 2}
   translations: []
-  nbArches: 150
+  rotations: []
+  nbArches: 51
 --- !u!4 &2128377447
 Transform:
   m_ObjectHideFlags: 0

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FollowingBezierCurve : MonoBehaviour
@@ -72,54 +71,74 @@ public class FollowingBezierCurve : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if(tobogganGenerator.transform.childCount == 0)
         {
             return;
         }
-        timeBuffer += frontSpeed * Time.deltaTime / totalTime;
-        if(timeBuffer >= 1f)
+        
+        if (timeBuffer >= 1f - (frontSpeed * Time.fixedDeltaTime / totalTime))
         {
-            timeBuffer -= 1f;
+            nextOrigin = Vector3.zero;
+            //change current index
             currentPartIndex++;
             if (currentPartIndex >= tobogganGenerator.tobogganParts.Length)
+            {
                 currentPartIndex = 0;
-            Debug.Log(currentPartIndex);
+                timeBuffer = 0;
+            }
+            else
+            {
+                timeBuffer = 0f;
+                Vector3 estimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex - 1].ctrlPoints, 1f);
+                estimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex - 1] * estimatedBezierPoint + tobogganGenerator.translations[currentPartIndex - 1];
+                Vector3 newEstimatedBezierPoint = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, 0f);
+                newEstimatedBezierPoint = tobogganGenerator.rotations[currentPartIndex] * newEstimatedBezierPoint + tobogganGenerator.translations[currentPartIndex];
+
+                Debug.Log(estimatedBezierPoint);
+                Debug.Log(newEstimatedBezierPoint);
+                Debug.Log(Vector3.Distance(estimatedBezierPoint, newEstimatedBezierPoint));
+            }
+            
         }
+
         //origin (x, y z) est un point de la courbe à l'instant t
         origin = nextOrigin == Vector3.zero ? BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer) : nextOrigin;
-
-
+        timeBuffer += frontSpeed * Time.fixedDeltaTime / totalTime;
         //nextOrigin (x, y z) est un point de la courbe à l'instant t + delta
         nextOrigin = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer);
 
         //dir => le vecteur directeur entre le point t et t+1
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
         if(frontSpeed > minFrontSpeed || dir.y <= 0)
-            frontSpeed += -dir.y * accelerateForce * Time.deltaTime * frontSpeed;
+            frontSpeed += -dir.y * accelerateForce * Time.fixedDeltaTime * frontSpeed;
         frontSpeed = Mathf.Min(Mathf.Max(0.05f, frontSpeed), 3f);
         if(frontSpeed < minFrontSpeed)
         {
-            frontSpeed += Time.deltaTime * accelerateForce;
+            frontSpeed += Time.fixedDeltaTime * accelerateForce;
         }
 
         //position sur l'arc de cercle autour de l'origine
         Vector3 newPosition = new Vector3(radius * Mathf.Cos(angle * Mathf.Deg2Rad), radius * Mathf.Sin(angle * Mathf.Deg2Rad), 0);
-        newPosition = Quaternion.LookRotation(dir) * newPosition;
-        newPosition += origin;
+        newPosition = tobogganGenerator.rotations[currentPartIndex] * Quaternion.LookRotation(dir) * newPosition;
+        Vector3 translatedAndRotatedOrigin = tobogganGenerator.rotations[currentPartIndex] * origin + tobogganGenerator.translations[currentPartIndex];
+        newPosition += translatedAndRotatedOrigin;
 
         //on modifie le transform
-        transform.LookAt(transform.position + dir * 10f);
+        Vector3 newDir = tobogganGenerator.rotations[currentPartIndex] * (dir * 10f);
         transform.position = newPosition;
+        transform.LookAt(transform.position + newDir);
         transform.localRotation = Quaternion.Euler(transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, angle + 90f);
-        transform.Translate(Quaternion.Inverse(transform.rotation) * tobogganGenerator.translations[currentPartIndex]);
+        //arrondi
+        transform.position = new Vector3(Mathf.Round(transform.position.x * 100f) * 0.01f, Mathf.Round(transform.position.y * 100f) * 0.01f, Mathf.Round(transform.position.z * 100f) * 0.01f);
 
         //on replace la caméra
-        thirdPersonCam.transform.position = origin + thirdPersonCam.transform.rotation * localCamPos;
-        thirdPersonCam.transform.LookAt(thirdPersonCam.transform.position + dir * 10f);
+        thirdPersonCam.transform.position = translatedAndRotatedOrigin + thirdPersonCam.transform.rotation * localCamPos;
+        thirdPersonCam.transform.LookAt(thirdPersonCam.transform.position + newDir);
         thirdPersonCam.transform.Rotate(localCamRotationX, 0, 0);
-        thirdPersonCam.transform.Translate(Quaternion.Inverse(thirdPersonCam.transform.rotation) * tobogganGenerator.translations[currentPartIndex]);
+        //arrondi
+        thirdPersonCam.transform.position = new Vector3(Mathf.Round(thirdPersonCam.transform.position.x * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.y * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.z * 100f) * 0.01f);
 
         //handle jump
         if (Input.GetButtonDown("Jump"))

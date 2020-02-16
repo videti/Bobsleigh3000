@@ -87,7 +87,8 @@ public class BezierShape : MonoBehaviour
         List<Vector3> bezierPoints = new List<Vector3>();
         for (int i = 0; i < _nbArches; i++)
         {
-            bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)_nbArches));
+            Debug.Log((double)i / (double)(_nbArches - 1));
+            bezierPoints.Add(GetBezierCurvePointAtT(controlPoints.ToArray(), (double)i / (double)(_nbArches - 1)));
         }
         return bezierPoints;
     }
@@ -128,10 +129,9 @@ public class BezierShape : MonoBehaviour
     {
         dir = Vector3.Normalize(dir);
         List<Vector3> points = new List<Vector3>();
-        Debug.Log(dir);
-        for (int i = 0; i <= nbPoints; i++)
+        for (int i = 0; i < nbPoints; i++)
         {
-            float teta = orientation - Mathf.Deg2Rad * totalAngle * i / (1f * nbPoints);
+            float teta = orientation - Mathf.Deg2Rad * totalAngle * i / (nbPoints - 1f);
             Vector3 newPoint = new Vector3(radius * Mathf.Cos(teta), radius * Mathf.Sin(teta), 0);
             //if (Mathf.Sign(previousdir.x) != Mathf.Sign(dir.x))
             //    dir *= -1;
