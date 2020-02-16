@@ -21,4 +21,23 @@ public class ScriptableControlPoints : ScriptableObject
     }
 
     public List<PipeParams> pipesParams;
+
+    public void SetAllBorderWidth(float width)
+    {
+        for (int i = 0; i < pipesParams.Count; i++)
+        {
+            PipeParams pipeParams = pipesParams[i];
+            pipeParams.borderWidth = width;
+            pipesParams[i] = pipeParams;
+        }
+    }
+    public void SetAllBorderHeight(float height)
+    {
+        for (int i = 0; i < pipesParams.Count; i++)
+        {
+            PipeParams pipeParams = pipesParams[i];
+            pipeParams.borderHeight = height;
+            pipesParams[i] = pipeParams;
+        }
+    }
 }

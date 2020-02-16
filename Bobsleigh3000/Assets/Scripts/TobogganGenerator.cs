@@ -7,19 +7,15 @@ using UnityEngine;
 public class TobogganGenerator : MonoBehaviour
 {
     public ScriptableControlPoints[] tobogganParts;
+    public float borderHeight = 0.25f, borderWidth = 0.1f;
     public Vector3[] translations;
     public Quaternion[] rotations;
-    public int nbArches = 100;
-
-    private void Awake()
-    {
-        translations = new Vector3[tobogganParts.Length];
-        rotations = new Quaternion[tobogganParts.Length];
-    }
 
     // joint different bezier curve together
     public void GeneratePipes()
     {
+        translations = new Vector3[tobogganParts.Length];
+        rotations = new Quaternion[tobogganParts.Length];
         translations[0] = -tobogganParts[0].pipesParams[0].bezierPoints[0];
         rotations[0] = Quaternion.Euler(0, 0, 0);
         
@@ -52,7 +48,12 @@ public class TobogganGenerator : MonoBehaviour
 
             foreach (ScriptableControlPoints.PipeParams param in tobogganParts[i].pipesParams)
             {
-                GameObject child = new GameObject("Pipe_" + (transform.childCount - 1));
+                string num = transform.childCount+"";
+                if (transform.childCount < 100)
+                    num = "0" + num;
+                if (transform.childCount < 10)
+                    num = "0" + num;
+                GameObject child = new GameObject("Pipe_" + num);
                 child.transform.parent = transform;
                 CustomPipe cp = child.AddComponent<CustomPipe>();
                 cp.shapeIndex = param.shapeIndex;
@@ -73,17 +74,104 @@ public class TobogganGenerator : MonoBehaviour
         }
         //Destroy(this);
     }
+
+    public void DisableCustomPipes()
+    {
+        foreach(CustomPipe customPipe in GetComponentsInChildren<CustomPipe>())
+        {
+            customPipe.SaveAssets();
+            customPipe.enabled = false;
+        }
+
+        PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, "Assets/Toboggan/Toboggan_" + Mathf.Round(Time.time * 10000f) + ".prefab", InteractionMode.AutomatedAction);
+    }
+
+    public void SetAllBorderWidth(float width)
+    {
+        for (int i = 0; i < tobogganParts.Length; i++)
+        {
+            ScriptableControlPoints scriptableCP = tobogganParts[i];
+            scriptableCP.SetAllBorderWidth(width);
+        }
+    }
+    public void SetAllBorderHeight(float height)
+    {
+        for (int i = 0; i < tobogganParts.Length; i++)
+        {
+            ScriptableControlPoints scriptableCP = tobogganParts[i];
+            scriptableCP.SetAllBorderHeight(height);
+        }
+    }
 }
 
 [CustomEditor(typeof(TobogganGenerator))]
 public class TobogganGeneratorEditor : Editor
 {
+
     public override void OnInspectorGUI()
     {
+        TobogganGenerator myTarget = ((TobogganGenerator)target);
         DrawDefaultInspector();
-        if (GUILayout.Button("Generate Pipes"))
+        if (myTarget.transform.childCount == 0)
         {
-            ((TobogganGenerator)target).GeneratePipes();
+            if (GUILayout.Button("Generate Pipes"))
+            {
+                myTarget.GeneratePipes();
+            }
+            if (GUILayout.Button("Set Height"))
+            {
+                myTarget.SetAllBorderHeight(myTarget.borderHeight);
+            }
+            if (GUILayout.Button("Set Width"))
+            {
+                myTarget.SetAllBorderWidth(myTarget.borderWidth);
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("Disable Scripts and Save asset"))
+            {
+                myTarget.DisableCustomPipes();
+            }
         }
     }
 }
+
+/** boosts
+ * 
+ * 21.75 -12.59 -0.2430819
+ * 0 0 -37
+ * 
+ * ---------
+ * 
+ * 26.8 -16.45 0.4
+ * -29.3 41.22 -51.89
+ * 
+ * ---------
+ *  
+ * 33.1 -22.382 -0.784
+ * 22.8 -29.7 -50.6
+ *  
+ *  pipe 10 disabled
+ *  
+ *  Wall
+ *  96.71 -40.53 -50.32
+ *  11.9 94.16601 0.392
+ *  
+ *  101.32 -41.77 -49.58
+ *  11.9 94.16601 0.392
+ *  
+ *  118.88 -47.86 -50.87
+ *  11.9 94.16601 0.392
+ *  
+ *  Boost
+ *  107.18 -44.31 -50.4
+ *  0 4.1 -18.6
+ *  
+ *  Wall
+ *  127.6 -47.84 -50.56
+ *  11.9 94.16601 0.392
+ *  
+ *  131.99 -47.13 -47.95
+ *  11.9 37.78 0.392
+ */

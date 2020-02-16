@@ -106,14 +106,31 @@ public class CustomPipe : MonoBehaviour
         if (EditorApplication.isPlaying && bezierPoints != null)
             CreateMesh();
     }
+
+    //Material[] shapeMaterials, borderShapeMaterials;
+    //public void OnInspectorGUI()
+    //{
+    //    if (GetComponent<MeshRenderer>() == null)
+    //        return;
+
+    //    if (shapeMaterials == null)
+    //        shapeMaterials = Resources.LoadAll<Material>("Mat/ShapeMat");
+    //    if (borderShapeMaterials == null)
+    //        borderShapeMaterials = Resources.LoadAll<Material>("Mat/BorderShapeMat");
+    //    string[] matNames = shapeMaterials.Select(x => x.name).ToArray();
+    //    shapeIndex = EditorGUILayout.Popup(shapeIndex, matNames);
+    //    GetComponent<MeshRenderer>().material = shapeMaterials[shapeIndex];
+    //    transform.GetChild(0).GetComponent<MeshRenderer>().material = borderShapeMaterials[shapeIndex];
+    //}
 }
 
 
-[CustomEditor(typeof(CustomPipe))]
+
+[CustomEditor(typeof(CustomPipe), true)]
 public class CustomPipeEditor : Editor
 {
     Material[] shapeMaterials, borderShapeMaterials;
-    
+
     public override void OnInspectorGUI()
     {
         CustomPipe myTarget = (CustomPipe)target;

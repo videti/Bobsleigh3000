@@ -8,7 +8,7 @@ public class FollowingBezierCurve : MonoBehaviour
     [Space()]
     [Header("Game General Params")]
     //game general params
-    [Range(1f, 30f)]
+    [Range(1f, 50f)]
     public float totalTime = 30f; //the time to finish the game if speed = 1
     [Range(0.01f, 3f)]
     public float frontSpeed = 1f; //default front speed
@@ -22,7 +22,7 @@ public class FollowingBezierCurve : MonoBehaviour
     public float angle = 40f; //default angle
     [Range(0f, 1.5f)]
     public float radius = 1f; //radius of invisible pipe to move around
-    [Range(0.001f, 20f)]
+    [Range(0.000f, 20f)]
     public float accelerateForce = 3f; //increase acceleration and deceleration for front speed
     [Range(1f, 20f)]
     public float maxDistanceToClick = 5f; //max dist of the clickable area on the ground
@@ -39,17 +39,26 @@ public class FollowingBezierCurve : MonoBehaviour
     public float initialForce = 50f;
     public float gravityForce = 9.8f;
 
+    [System.Serializable]
+    public enum CreateMode
+    {
+        None,
+        Boost,
+        Wall
+    }
+    public CreateMode createMode;
+
     Coroutine jumpCoroutine;
     float currentJumpForce;
     float timeBuffer = 0f;
     Vector3 origin, nextOrigin;
     int currentPartIndex = 0;
 
-    TobogganGenerator tobogganGenerator;
+    public TobogganGenerator tobogganGenerator;
 
     private void Start()
     {
-        tobogganGenerator = GameObject.FindObjectOfType<TobogganGenerator>();
+        //tobogganGenerator = GameObject.FindObjectOfType<TobogganGenerator>();
         nextOrigin = Vector3.zero;
         currentJumpForce = initialForce;
     }
@@ -71,14 +80,14 @@ public class FollowingBezierCurve : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if(tobogganGenerator.transform.childCount == 0)
         {
             return;
         }
         
-        if (timeBuffer >= 1f - (frontSpeed * Time.fixedDeltaTime / totalTime))
+        if (timeBuffer >= 1f - (frontSpeed * Time.deltaTime / totalTime))
         {
             nextOrigin = Vector3.zero;
             //change current index
@@ -105,18 +114,18 @@ public class FollowingBezierCurve : MonoBehaviour
 
         //origin (x, y z) est un point de la courbe à l'instant t
         origin = nextOrigin == Vector3.zero ? BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer) : nextOrigin;
-        timeBuffer += frontSpeed * Time.fixedDeltaTime / totalTime;
+        timeBuffer += frontSpeed * Time.deltaTime / totalTime;
         //nextOrigin (x, y z) est un point de la courbe à l'instant t + delta
         nextOrigin = BezierShape.GetBezierCurvePointAtT(tobogganGenerator.tobogganParts[currentPartIndex].ctrlPoints, timeBuffer);
 
         //dir => le vecteur directeur entre le point t et t+1
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
         if(frontSpeed > minFrontSpeed || dir.y <= 0)
-            frontSpeed += -dir.y * accelerateForce * Time.fixedDeltaTime * frontSpeed;
-        frontSpeed = Mathf.Min(Mathf.Max(0.05f, frontSpeed), 3f);
+            frontSpeed += -dir.y * accelerateForce * Time.deltaTime * frontSpeed;
+        frontSpeed = Mathf.Min(Mathf.Max(0.01f, frontSpeed), 3f);
         if(frontSpeed < minFrontSpeed)
         {
-            frontSpeed += Time.fixedDeltaTime * accelerateForce;
+            frontSpeed += Time.deltaTime * accelerateForce;
         }
 
         //position sur l'arc de cercle autour de l'origine
@@ -130,15 +139,16 @@ public class FollowingBezierCurve : MonoBehaviour
         transform.position = newPosition;
         transform.LookAt(transform.position + newDir);
         transform.localRotation = Quaternion.Euler(transform.localRotation.eulerAngles.x, transform.localRotation.eulerAngles.y, angle + 90f);
+        
         //arrondi
-        transform.position = new Vector3(Mathf.Round(transform.position.x * 100f) * 0.01f, Mathf.Round(transform.position.y * 100f) * 0.01f, Mathf.Round(transform.position.z * 100f) * 0.01f);
+        //transform.position = new Vector3(Mathf.Round(transform.position.x * 100f) * 0.01f, Mathf.Round(transform.position.y * 100f) * 0.01f, Mathf.Round(transform.position.z * 100f) * 0.01f);
 
         //on replace la caméra
         thirdPersonCam.transform.position = translatedAndRotatedOrigin + thirdPersonCam.transform.rotation * localCamPos;
         thirdPersonCam.transform.LookAt(thirdPersonCam.transform.position + newDir);
         thirdPersonCam.transform.Rotate(localCamRotationX, 0, 0);
         //arrondi
-        thirdPersonCam.transform.position = new Vector3(Mathf.Round(thirdPersonCam.transform.position.x * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.y * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.z * 100f) * 0.01f);
+        //thirdPersonCam.transform.position = new Vector3(Mathf.Round(thirdPersonCam.transform.position.x * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.y * 100f) * 0.01f, Mathf.Round(thirdPersonCam.transform.position.z * 100f) * 0.01f);
 
         //handle jump
         if (Input.GetButtonDown("Jump"))
@@ -149,7 +159,7 @@ public class FollowingBezierCurve : MonoBehaviour
         {
             //handle click
             if (Input.GetMouseButton(0))
-                ClickOnGround();
+                ClickOnGround(newDir);
 
             //gravity force simulation
             RecenterCharacter();
@@ -175,20 +185,37 @@ public class FollowingBezierCurve : MonoBehaviour
     }
 
     //adjust angle when a click on ground is performed
-    void ClickOnGround()
+    void ClickOnGround(Vector3 newDir)
     {
         var ray = thirdPersonCam.ScreenPointToRay( Input.mousePosition);
 
         RaycastHit hit = new RaycastHit();
 
-        if (Physics.Raycast(ray, out hit, 10))
+        if (Physics.Raycast(ray, out hit, 100))
         {
             if (hit.distance <= maxDistanceToClick)
             {
                 float signedDifAngle = Vector3.SignedAngle(-transform.up, -hit.normal, transform.forward);
                 if(Mathf.Abs(signedDifAngle) > 5f)
                     angle += signedDifAngle * lateralSpeed * Time.deltaTime;
+
+                if (createMode == CreateMode.Boost && Input.GetMouseButtonDown(0))
+                {
+                    GameObject boost = Instantiate(Resources.Load<GameObject>("Prefabs/Boost"), GameObject.Find("Boosts").transform);
+                    boost.name = "Boost" + GameObject.Find("Boosts").transform.childCount;
+                    boost.transform.position = hit.point;
+                    boost.transform.LookAt(newDir + transform.position);
+                    boost.transform.Rotate(0, -90f, 0);
+                    //boost
+                } else if (createMode == CreateMode.Wall && Input.GetMouseButtonDown(0))
+                {
+                    GameObject wall = Instantiate(Resources.Load<GameObject>("Prefabs/Wall"), GameObject.Find("Walls").transform);
+                    wall.name = "Wall" + GameObject.Find("Walls").transform.childCount;
+                    wall.transform.position = hit.point;
+                    wall.transform.LookAt(newDir + transform.position);
+                }
             }
+
         }
     }
 

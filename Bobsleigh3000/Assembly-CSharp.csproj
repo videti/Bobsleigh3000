@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AutoLoadMesh.cs" />
+    <Compile Include="Assets\AutoSaveTransform.cs" />
     <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGBuilder.cs" />
     <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGColliderEnabler.cs" />
     <Compile Include="Assets\DestructibleWallGenerator\DWG\Scripts\DWGCreateBrick.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Assets\Scripts\MovingOffset.cs" />
     <Compile Include="Assets\Scripts\SaveAsset.cs" />
     <Compile Include="Assets\Scripts\ScriptableObject\ScriptableControlPoints.cs" />
+    <Compile Include="Assets\Scripts\ScriptableObject\ScriptableTransform.cs" />
     <Compile Include="Assets\Scripts\SerializeMesh.cs" />
     <Compile Include="Assets\Scripts\TobogganGenerator.cs" />
     <None Include="Assets\ProCore\ProBuilder\Shader\pb_ScrollHighlight.shader" />

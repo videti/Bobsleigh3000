@@ -10,7 +10,7 @@ public class BezierShape : MonoBehaviour
     //public params
     public Vector3[] controlPoints;
     [Range(3,300)]
-    public int nbArches = 30;
+    public int nbArches = 120;
     [Range(1,20)]
     public int nbArchesBakedTogether = 5;
     public float thickness = 0.05f;
@@ -156,7 +156,10 @@ public class BezierShape : MonoBehaviour
     {
         if (destroyChildren)
             DestroyChildren(transform);
-
+        for(int i = 0; i< transform.childCount;i++)
+        {
+            controlPoints[i] = transform.GetChild(i).transform.position;
+        }
         CreatePipeMeshesFromBezier();
     }
 
