@@ -8,6 +8,8 @@ public class HandlePlayerCollisions : MonoBehaviour
     FollowingBezierCurve playerController;
     Rigidbody rigidBody;
     FollowingBezierCurve followingBezierCurve;
+    List<GameObject> groundTriggerList = new List<GameObject>();
+    bool falling = false;
 
     private void Start()
     {
@@ -18,17 +20,29 @@ public class HandlePlayerCollisions : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Boost")
+        if (other.tag == "Boost")
         {
             playerController.frontSpeed = Mathf.Max(playerController.frontSpeed, boostSpeed);
         }
-        else
-        if(other.tag == "Hole")
+        else if (other.gameObject.layer == 10)
         {
-            rigidBody.isKinematic = false;
-            rigidBody.constraints = RigidbodyConstraints.None;
-            followingBezierCurve.enabled = false;
-            Invoke("ResetFall", 2f);
+            groundTriggerList.Add(other.gameObject);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.layer == 10)
+        {
+            groundTriggerList.Remove(other.gameObject);
+            if (groundTriggerList.Count == 0 && followingBezierCurve.jumping == false && !falling)
+            {
+                rigidBody.isKinematic = false;
+                rigidBody.constraints = RigidbodyConstraints.None;
+                followingBezierCurve.enabled = false;
+                falling = true;
+                Invoke("ResetFall", 2f);
+            }
         }
     }
 
@@ -38,6 +52,12 @@ public class HandlePlayerCollisions : MonoBehaviour
         rigidBody.isKinematic = true;
         rigidBody.constraints = RigidbodyConstraints.FreezeRotation;
         followingBezierCurve.enabled = true;
+        Invoke("StopFalling", 0.5f);
+    }
+
+    void StopFalling()
+    {
+        falling = false;
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -21,6 +21,8 @@ public class CustomPipe : MonoBehaviour
     public float borderWidth = 0.2f, borderHeight = 0.05f;
     public bool noBorderLeft = false, noBorderRight = false;
 
+    public Material[] shapeMaterials, borderShapeMaterials;
+
     [HideInInspector]
     public int shapeIndex = 0;
 
@@ -79,11 +81,9 @@ public class CustomPipe : MonoBehaviour
         go.transform.parent = transform;
 
         MeshRenderer mr = (!GetComponent<MeshRenderer>()) ? gameObject.AddComponent<MeshRenderer>() : GetComponent<MeshRenderer>();
-        Material[] shapeMaterials, borderShapeMaterials;
-        shapeMaterials = Resources.LoadAll<Material>("Mat/ShapeMat");
-        borderShapeMaterials = Resources.LoadAll<Material>("Mat/BorderShapeMat");
+        
         mr.material = shapeMaterials[shapeIndex];
-        transform.GetChild(0).GetComponent<MeshRenderer>().material = borderShapeMaterials[shapeIndex];
+        childMR.material = borderShapeMaterials[shapeIndex];
     }
 
     public void SaveAssets()

@@ -10,7 +10,7 @@ public class FollowingBezierCurve : MonoBehaviour
     //game general params
     [Range(1f, 50f)]
     public float totalTime = 30f; //the time to finish the game if speed = 1
-    [Range(0.01f, 3f)]
+    [Range(0.01f, 6f)]
     public float frontSpeed = 1f; //default front speed
     [Range(0.01f, 3f)]
     public float minFrontSpeed = 0.3f; //min front speed
@@ -122,7 +122,7 @@ public class FollowingBezierCurve : MonoBehaviour
         Vector3 dir = Vector3.Normalize(nextOrigin - origin);
         if(frontSpeed > minFrontSpeed || dir.y <= 0)
             frontSpeed += -dir.y * accelerateForce * Time.deltaTime * frontSpeed;
-        frontSpeed = Mathf.Min(Mathf.Max(0.01f, frontSpeed), 3f);
+        frontSpeed = Mathf.Min(Mathf.Max(0.01f, frontSpeed), 6f);
         if(frontSpeed < minFrontSpeed)
         {
             frontSpeed += Time.deltaTime * accelerateForce;
